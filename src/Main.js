@@ -1,7 +1,7 @@
 import Phaser from "./libs/phaser-full.min";
 // import GameGlobal from "./data/GameGlobal";
 // import HomeScene from "./scenes/HomeScene";
-// import MainScene from "./scenes/MainScene";
+import MainScene from "./scenes/MainScene";
 // import RankScene from "./scenes/RankScene";
 // import GameEnded from "./scenes/GameEnded";
 
@@ -14,17 +14,19 @@ export default class Main extends Phaser.Game {
             canvas: canvas,
             width: screenWidth * pixelRatio,
             height: screenHeight * pixelRatio,
-            backgroundColor: 0xffffff,
+            // backgroundColor: 0xffffff,
             physics: {
-                default: "arcade",
-                arcade: {
-                    debug: false
+                default: "matter",
+                matter: {
+                    debug: true
                 }
             },
             input: {
+                mouse: true,
                 touch: true
             },
             // scene: [HomeScene, MainScene, RankScene, GameEnded],
+            scene: MainScene
         });
 
         const aspectRatio = 568 / 320;

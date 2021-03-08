@@ -4,149 +4,227 @@ import Board from "./MainScene/Board";
 import GameGlobal from "../data/GameGlobal";
 import Tile from "./MainScene/Tile";
 
+
+import { KEY_CRATE } from './MainScene/utils/CratePool';
+
+const INFO_FORMAT =
+    "Size:       %1\n" +
+    "Spawned:    %2\n" +
+    "Despawned:  %3\n";
+
 export default class MainScene extends Scene {
     constructor() {
         super("MainScene");
     }
 
     preload() {
-        this.load.image("tile", "assets/images/tile.png");
-        this.load.image("undo-btn", "assets/images/undo-btn.png");
-        this.load.image("home-btn", "assets/images/home-btn.png");
-        [...Array(8).keys()].forEach(i => {
-            this.load.image(`particles${i}`, `assets/images/particles${i}.png`);
-        });
+        this.load.image(KEY_CRATE, "assets/images/grain__x1_1_x1_2_x1_3_x1_4_png_1354830084.png");
 
-        this.load.image("best-score", "assets/images/best-score.png");
-        this.load.bitmapFont(
-            "basic-square-7-solid",
-            "assets/fonts/bitmap/basic-square-7-solid_0.png",
-            "assets/fonts/bitmap/basic-square-7-solid.xml"
-        );
+
+        // this.load.image("tile", "assets/images/tile.png");
+        // this.load.image("undo-btn", "assets/images/undo-btn.png");
+        // this.load.image("home-btn", "assets/images/home-btn.png");
+        // [...Array(8).keys()].forEach(i => {
+        //     this.load.image(`particles${i}`, `assets/images/particles${i}.png`);
+        // });
+
+        // this.load.image("best-score", "assets/images/best-score.png");
+        // this.load.bitmapFont(
+        //     "basic-square-7-solid",
+        //     "assets/fonts/bitmap/basic-square-7-solid_0.png",
+        //     "assets/fonts/bitmap/basic-square-7-solid.xml"
+        // );
     }
 
     create() {
-        this.cameras.main.setBackgroundColor(0xffffff);
+        this.matter.world.setBounds(0, -100, this.scale.width, this.scale.height + 100)
 
-        this.board = new Board(this);
-        this.createChesses();
+        this.group = this.add.cratePool()
+        this.group.initializeWithSize(5)
 
-        this.undoBtn = this.add.image(
-            GameGlobal.centerX - GameGlobal.width * 0.4,
-            GameGlobal.centerY - GameGlobal.height * 0.45,
-            "undo-btn"
-        ).setInteractive();
-        this.undoBtn.displayWidth = 0.06 * GameGlobal.width;
-        this.undoBtn.displayHeight = this.autoDisplayHeight(this.undoBtn);
-        this.undoBtn.setTint(0x00c777);
-        this.undoBtn.alpha = 0;
-        let _this = this;
-        this.undoBtn.on("pointerup", function () {
-            if (this.alpha != 1 || !this.chess) {
-                return;
+        // this.input.on(Phaser.Input.Events.POINTER_DOWN_OUTSIDE, (pointer) => {
+        //     this.spawnCrate(pointer.x, pointer.y)
+        // })
+
+        this.time.addEvent({
+            delay: 500,
+            loop: true,
+            callback: () => {
+                this.spawnCrate()
             }
+        })
 
-            if (_this.chesses.length == Chess.directions.length) {
-                _this.chesses.forEach((chess) => chess.exit());
-            }
+        this.infoText = this.add.text(16, 16, '')
+        // this.infoText.setInteractive().on('pointerdown', function(pointer, localX, localY, event){
+        //     console.log("test");
+        // });
 
-            _this.chesses.push(this.chess);
-            this.chess.takeback();
-            this.chess = null;
-            this.setTint(0xe5e5e5);
-        });
 
-        this.undoBtn.onPlaceChess = function (chess) {
-            if (this.alpha != 1) {
-                _this.tweens.add({
-                    targets: this,
-                    alpha: 1,
-                    duration: 300,
-                    ease: "Power2"
-                });
-            }
+        // this.cameras.main.setBackgroundColor(0xffffff);
 
-            if (this.chess) {
-                this.chess.commit();
-            }
+        // this.board = new Board(this);
+        // this.createChesses();
 
-            if (!chess) {
-                this.setTint(0xe5e5e5);
-            } else {
-                this.setTint(0x00c777);
-            }
+        // this.undoBtn = this.add.image(
+        //     GameGlobal.centerX - GameGlobal.width * 0.4,
+        //     GameGlobal.centerY - GameGlobal.height * 0.45,
+        //     "undo-btn"
+        // ).setInteractive();
+        // this.undoBtn.displayWidth = 0.06 * GameGlobal.width;
+        // this.undoBtn.displayHeight = this.autoDisplayHeight(this.undoBtn);
+        // this.undoBtn.setTint(0x00c777);
+        // this.undoBtn.alpha = 0;
+        // let _this = this;
+        // this.undoBtn.on("pointerup", function () {
+        //     if (this.alpha != 1 || !this.chess) {
+        //         return;
+        //     }
 
-            this.chess = chess;
-        }
+        //     if (_this.chesses.length == Chess.directions.length) {
+        //         _this.chesses.forEach((chess) => chess.exit());
+        //     }
 
-        let homeBtn = this.add.image(
-            GameGlobal.centerX - GameGlobal.width * 0.4,
-            GameGlobal.centerY + GameGlobal.height * 0.45,
-            "home-btn"
-        ).setInteractive();
-        homeBtn.displayWidth = 0.06 * GameGlobal.width;
-        homeBtn.displayHeight = this.autoDisplayHeight(homeBtn);
-        homeBtn.on("pointerup", () => {
-            this.scene.pause();
-            this.scene.launch("HomeScene", { fromMainScene: true });
-            this.scene.bringToTop("HomeScene");
-        });
+        //     _this.chesses.push(this.chess);
+        //     this.chess.takeback();
+        //     this.chess = null;
+        //     this.setTint(0xe5e5e5);
+        // });
 
-        this.audio.addNavTap(homeBtn);
+        // this.undoBtn.onPlaceChess = function (chess) {
+        //     if (this.alpha != 1) {
+        //         _this.tweens.add({
+        //             targets: this,
+        //             alpha: 1,
+        //             duration: 300,
+        //             ease: "Power2"
+        //         });
+        //     }
 
-        this.bestScoreIcon = this.add.image(
-            GameGlobal.centerX,
-            GameGlobal.centerY - GameGlobal.height * 0.45,
-            "best-score"
-        );
-        this.bestScoreIcon.displayWidth = this.undoBtn.displayWidth;
-        this.bestScoreIcon.displayHeight = this.autoDisplayHeight(this.bestScoreIcon);
+        //     if (this.chess) {
+        //         this.chess.commit();
+        //     }
 
-        this.currentScore = this.add.bitmapText(
-            GameGlobal.centerX - this.bestScoreIcon.displayWidth,
-            GameGlobal.centerY - GameGlobal.height * 0.45,
-            "basic-square-7-solid",
-            "0", 0.05 * GameGlobal.width
-        ).setOrigin(1, 0.5);
-        this.currentScore.value = 0;
+        //     if (!chess) {
+        //         this.setTint(0xe5e5e5);
+        //     } else {
+        //         this.setTint(0x00c777);
+        //     }
 
-        let bestRecord = 0;
-        try {
-            let data = wx.getStorageSync("data")
-            if (data) {
-                data = JSON.parse(data);
-                if (data.bestRecord) {
-                    bestRecord = data.bestRecord;
+        //     this.chess = chess;
+        // }
 
-                    // Make sure the best record in the local storage is synced
-                    wx.getOpenDataContext().postMessage({
-                        action: "RankScene",
-                        score: bestRecord,
-                        update_time: data.lastUpdate
-                    });
-                }
-            }
-        } catch (e) {
-            console.error(e);
-        }
+        // let homeBtn = this.add.image(
+        //     GameGlobal.centerX - GameGlobal.width * 0.4,
+        //     GameGlobal.centerY + GameGlobal.height * 0.45,
+        //     "home-btn"
+        // ).setInteractive();
+        // homeBtn.displayWidth = 0.06 * GameGlobal.width;
+        // homeBtn.displayHeight = this.autoDisplayHeight(homeBtn);
+        // homeBtn.on("pointerup", () => {
+        //     this.scene.pause();
+        //     this.scene.launch("HomeScene", { fromMainScene: true });
+        //     this.scene.bringToTop("HomeScene");
+        // });
 
-        this.bestScore = this.add.bitmapText(
-            GameGlobal.centerX + this.bestScoreIcon.displayWidth,
-            GameGlobal.centerY - GameGlobal.height * 0.45,
-            "basic-square-7-solid",
-            bestRecord, 0.05 * GameGlobal.width
-        ).setOrigin(0, 0.5);
-        this.bestScore.value = bestRecord;
+        // this.audio.addNavTap(homeBtn);
+
+        // this.bestScoreIcon = this.add.image(
+        //     GameGlobal.centerX,
+        //     GameGlobal.centerY - GameGlobal.height * 0.45,
+        //     "best-score"
+        // );
+        // this.bestScoreIcon.displayWidth = this.undoBtn.displayWidth;
+        // this.bestScoreIcon.displayHeight = this.autoDisplayHeight(this.bestScoreIcon);
+
+        // this.currentScore = this.add.bitmapText(
+        //     GameGlobal.centerX - this.bestScoreIcon.displayWidth,
+        //     GameGlobal.centerY - GameGlobal.height * 0.45,
+        //     "basic-square-7-solid",
+        //     "0", 0.05 * GameGlobal.width
+        // ).setOrigin(1, 0.5);
+        // this.currentScore.value = 0;
+
+        // let bestRecord = 0;
+        // try {
+        //     let data = wx.getStorageSync("data")
+        //     if (data) {
+        //         data = JSON.parse(data);
+        //         if (data.bestRecord) {
+        //             bestRecord = data.bestRecord;
+
+        //             // Make sure the best record in the local storage is synced
+        //             wx.getOpenDataContext().postMessage({
+        //                 action: "RankScene",
+        //                 score: bestRecord,
+        //                 update_time: data.lastUpdate
+        //             });
+        //         }
+        //     }
+        // } catch (e) {
+        //     console.error(e);
+        // }
+
+        // this.bestScore = this.add.bitmapText(
+        //     GameGlobal.centerX + this.bestScoreIcon.displayWidth,
+        //     GameGlobal.centerY - GameGlobal.height * 0.45,
+        //     "basic-square-7-solid",
+        //     bestRecord, 0.05 * GameGlobal.width
+        // ).setOrigin(0, 0.5);
+        // this.bestScore.value = bestRecord;
     }
 
     update() {
-        this.chesses.forEach((chess) => {
-            if (chess.container.body.embedded) chess.container.body.touching.none = false;
-            var touching = !chess.container.body.touching.none;
-            var wasTouching = !chess.container.body.wasTouching.none;
+        if (!this.group || !this.infoText) {
+            return
+        }
 
-            if (!touching && wasTouching) chess.emit("overlapend", chess);
-        });
+        const size = this.group.getLength()
+        const used = this.group.getTotalUsed()
+        const text = Phaser.Utils.String.Format(
+            INFO_FORMAT,
+            [
+                size,
+                used,
+                size - used
+            ]
+        )
+
+        this.infoText.setText(text)
+
+        // this.chesses.forEach((chess) => {
+        //     if (chess.container.body.embedded) chess.container.body.touching.none = false;
+        //     var touching = !chess.container.body.touching.none;
+        //     var wasTouching = !chess.container.body.wasTouching.none;
+
+        //     if (!touching && wasTouching) chess.emit("overlapend", chess);
+        // });
+    }
+
+    spawnCrate() {
+        if (!this.group) {
+            return null
+        }
+
+        if (this.group.countActive(true) >= 10) {
+            return
+        }
+
+        const tex = this.textures.get(KEY_CRATE)
+        const halfWidth = tex.getSourceImage().width * 0.5
+        const x = Phaser.Math.Between(halfWidth, this.scale.width - halfWidth)
+
+        const crate = this.group.spawn(x, 0)
+
+        if (!crate) {
+            return
+        }
+
+        crate.setInteractive()
+            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, pointer => {
+                this.group && this.group.despawn(crate)
+            })
+
+        return crate
     }
 
     createChesses() {
