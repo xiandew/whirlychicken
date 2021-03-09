@@ -1,11 +1,8 @@
 import Scene from "./Scene";
 import Chess from "./MainScene/Chess";
 import Board from "./MainScene/Board";
-import GameGlobal from "../data/GameGlobal";
 import Tile from "./MainScene/Tile";
-
-
-import { KEY_CRATE } from './MainScene/utils/CratePool';
+import "./MainScene/utils/Pool";
 
 const INFO_FORMAT =
     "Size:       %1\n" +
@@ -18,8 +15,13 @@ export default class MainScene extends Scene {
     }
 
     preload() {
-        this.load.image(KEY_CRATE, "assets/images/grain__x1_1_x1_2_x1_3_x1_4_png_1354830084.png");
-
+        this.load.image("crate", "assets/images/grain__x1_1_x1_2_x1_3_x1_4_png_1354830084.png");
+        this.load.image("clouds", "assets/images/clouds.png");
+        this.load.image("bg_layer1", "assets/images/bg_layer1.png");
+        this.load.image("bg_layer2", "assets/images/bg_layer2.png");
+        this.load.image("bg_layer3", "assets/images/bg_layer3.png");
+        this.load.image("bg_layer4", "assets/images/bg_layer4.png");
+        this.load.atlas("spritesheet_jumper", 'assets/atlas/spritesheet_jumper.png', 'assets/atlas/spritesheet_jumper.json');
 
         // this.load.image("tile", "assets/images/tile.png");
         // this.load.image("undo-btn", "assets/images/undo-btn.png");
@@ -37,28 +39,28 @@ export default class MainScene extends Scene {
     }
 
     create() {
-        this.matter.world.setBounds(0, -100, this.scale.width, this.scale.height + 100)
 
-        this.group = this.add.cratePool()
-        this.group.initializeWithSize(5)
+        this.bgLayer1 = this.add.image(0, 0, "bg_layer1").setOrigin(0);
+        this.bgLayer1.displayWidth = this.game.config.width;
+        this.bgLayer1.displayHeight = this.game.config.height;
+        this.bgLayer2 = this.add.tileSprite(0, 0, this.game.config.width, this.game.config.height, "bg_layer2").setOrigin(0).setTileScale(.5);
+        this.bgLayer3 = this.add.tileSprite(0, 0, this.game.config.width, this.game.config.height, "bg_layer3").setOrigin(0).setTileScale(.5);
+        this.bgLayer4 = this.add.tileSprite(0, 0, this.game.config.width, this.game.config.height, "bg_layer4").setOrigin(0).setTileScale(.5);
+        this.bgLayer1.setScrollFactor(0);
+        this.bgLayer2.setScrollFactor(0);
+        this.bgLayer3.setScrollFactor(0);
+        this.bgLayer4.setScrollFactor(0);
 
-        // this.input.on(Phaser.Input.Events.POINTER_DOWN_OUTSIDE, (pointer) => {
-        //     this.spawnCrate(pointer.x, pointer.y)
-        // })
+        this.matter.world.setBounds(0, 0, this.scale.width, this.scale.height);
 
-        this.time.addEvent({
-            delay: 500,
-            loop: true,
-            callback: () => {
-                this.spawnCrate()
-            }
-        })
+        this.group = this.add.pool();
+        this.group.initializeWithSize(10);
 
-        this.infoText = this.add.text(16, 16, '')
-        // this.infoText.setInteractive().on('pointerdown', function(pointer, localX, localY, event){
-        //     console.log("test");
-        // });
+        this.platformWidth = 0.08 * this.scale.width;
+        this.platformSeparation = 2 * this.platformWidth;
+        this.spawnPlatforms(10);
 
+        this.infoText = this.add.text(16, 16, '');
 
         // this.cameras.main.setBackgroundColor(0xffffff);
 
@@ -174,6 +176,10 @@ export default class MainScene extends Scene {
     }
 
     update() {
+        this.bgLayer2.tilePositionX -= .5;
+        this.bgLayer3.tilePositionX -= .25;
+        this.bgLayer4.tilePositionX += .05;
+
         if (!this.group || !this.infoText) {
             return
         }
@@ -200,31 +206,42 @@ export default class MainScene extends Scene {
         // });
     }
 
-    spawnCrate() {
+    spawnPlatforms() {
+        range(Math.floor(this.scale.height / this.platformSeparation)).forEach((e, i) => {
+            this.createPlatform(
+                this.scale.width * 0.2 + Phaser.Math.Between(0, this.scale.width * 0.6 - this.platformWidth),
+                this.scale.height - this.platformSeparation - this.platformSeparation * i
+            );
+        });
+    }
+
+    createPlatform(x, y) {
         if (!this.group) {
             return null
         }
 
-        if (this.group.countActive(true) >= 10) {
+        // if (this.group.countActive(true) >= 10) {
+        //     return
+        // }
+
+        // const tex = this.textures.get("crate")
+        // const halfWidth = tex.getSourceImage().width * 0.5
+        // const x = Phaser.Math.Between(halfWidth, this.scale.width - halfWidth)
+
+        const platform = this.group.spawn(x, y, "spritesheet_jumper", "ground_sand.png");
+
+        if (!platform) {
             return
         }
 
-        const tex = this.textures.get(KEY_CRATE)
-        const halfWidth = tex.getSourceImage().width * 0.5
-        const x = Phaser.Math.Between(halfWidth, this.scale.width - halfWidth)
-
-        const crate = this.group.spawn(x, 0)
-
-        if (!crate) {
-            return
-        }
-
-        crate.setInteractive()
+        platform.displayWidth = this.platformWidth;
+        platform.displayHeight = this.autoDisplayHeight(platform);
+        platform.setInteractive()
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, pointer => {
-                this.group && this.group.despawn(crate)
+                this.group && this.group.despawn(platform)
             })
 
-        return crate
+        return platform
     }
 
     createChesses() {
@@ -386,4 +403,9 @@ export default class MainScene extends Scene {
             });
         }
     }
+}
+
+function range(start, end) {
+    if (!end) end = start, start = 0;
+    return [...Array(end - start).keys()].map(i => i + start);
 }
