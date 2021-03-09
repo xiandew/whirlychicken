@@ -2,5 +2,5 @@
 
 ## Credits
 
- - https://www.glitchthegame.com/items/basic-resources/grain/
- - https://www.glitchthegame.com/inhabitants/animals/chicken/
+- glitchthegame.com
+- www.kenney.nl
