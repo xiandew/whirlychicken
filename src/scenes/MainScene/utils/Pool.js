@@ -2,17 +2,10 @@
 
 import Phaser from "../../../libs/phaser-full.min";
 
-class CustomMatterImage extends Phaser.Physics.Matter.Image {
-    constructor(scene, x, y, key, frame, options) {
-        super(scene.matter.world, x, y, key, frame, options);
-        this.setIgnoreGravity(true);
-    }
-}
-
 class Pool extends Phaser.GameObjects.Group {
     constructor(scene, config) {
         const defaults = {
-            classType: CustomMatterImage,
+            classType: Phaser.GameObjects.Image,
             maxSize: -1
         }
 
@@ -48,7 +41,7 @@ class Pool extends Phaser.GameObjects.Group {
         }
 
         this.createMultiple({
-            key: this.defaultKey, 
+            key: this.defaultKey,
             frame: this.defaultFrame,
             quantity: size,
             // visible: false,
