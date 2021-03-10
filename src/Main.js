@@ -16,13 +16,13 @@ export default class Main extends Phaser.Game {
             height: screenHeight * pixelRatio,
             // backgroundColor: 0xffffff,
             physics: {
-                default: "matter",
-                matter: {
+                default: "arcade",
+                arcade: {
+                    gravity: { y: 300 },
                     debug: true
                 }
             },
             input: {
-                mouse: true,
                 touch: true
             },
             // scene: [HomeScene, MainScene, RankScene, GameEnded],
