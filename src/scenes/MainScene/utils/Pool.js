@@ -7,9 +7,9 @@ class Pool extends Phaser.GameObjects.Group {
         const defaults = {
             classType: Phaser.GameObjects.Image,
             maxSize: -1
-        }
+        };
 
-        super(scene, Object.assign(defaults, config))
+        super(scene, Object.assign(defaults, config));
     }
 
     spawn(x = 0, y = 0, key = this.defaultKey, frame = this.defaultFrame) {
@@ -18,8 +18,8 @@ class Pool extends Phaser.GameObjects.Group {
         const obj = this.get(x, y, key, frame);
 
         if (spawnExisting) {
-            obj.setVisible(true)
-            obj.setActive(true)
+            obj.setVisible(true);
+            obj.setActive(true);
             obj.world && obj.world.add(obj.body);
         }
 
@@ -27,17 +27,17 @@ class Pool extends Phaser.GameObjects.Group {
     }
 
     despawn(obj) {
-        this.killAndHide(obj)
+        this.killAndHide(obj);
 
-        obj.alpha = 1
-        obj.scale = 1
-        obj.removeInteractive()
-        obj.world && obj.world.remove(obj.body)
+        obj.alpha = 1;
+        obj.scale = 1;
+        obj.removeInteractive();
+        obj.world && obj.world.remove(obj.body);
     }
 
     initializeWithSize(size) {
         if (this.getLength() > 0 || size <= 0) {
-            return
+            return;
         }
 
         this.createMultiple({
@@ -46,7 +46,7 @@ class Pool extends Phaser.GameObjects.Group {
             quantity: size,
             // visible: false,
             // active: false
-        })
+        });
     }
 }
 
