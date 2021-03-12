@@ -3,10 +3,13 @@ import Scene from "./Scene";
 import Platform from "./MainScene/Platform";
 
 const INFO_FORMAT =
-    "FPS:        %4\n" +
-    "Size:       %1\n" +
-    "Spawned:    %2\n" +
-    "Despawned:  %3\n";
+    "FPS:        %1\n" +
+    "Size:       %2\n" +
+    "Spawned:    %3\n" +
+    "Despawned:  %4\n\n" +
+    "Size:       %5\n" +
+    "Spawned:    %6\n" +
+    "Despawned:  %7\n";
 
 export default class MainScene extends Scene {
     constructor() {
@@ -115,9 +118,15 @@ export default class MainScene extends Scene {
         }
         const size = this.platforms.getLength();
         const used = this.platforms.getTotalUsed();
+        const spriteSize = Platform.sprites.getLength();
+        const spriteUsed = Platform.sprites.getTotalUsed();
         const text = Phaser.Utils.String.Format(
             INFO_FORMAT,
-            [size, used, size - used, (1000 / delta).toFixed(3)]
+            [
+                (1000 / delta).toFixed(3),
+                size, used, size - used,
+                spriteSize, spriteUsed, spriteSize - spriteUsed
+            ]
         );
         this.infoText.setText(text);
     }
