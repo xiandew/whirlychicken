@@ -10,8 +10,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setOrigin(0.71, 0.5);
         this.setScale(3 * Platform.width / this.width);
         this.body.setSize(50, 90);
-
         this.turnLeft();
+        this.setCollideWorldBounds(true);
+
+        this.startY = this.y;
+        this.deltaY = 0;
     }
 
     turnLeft() {
@@ -25,6 +28,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     update() {
-        
+        this.deltaY = Math.max(this.deltaY, Math.abs(this.y - this.startY));
     }
 }

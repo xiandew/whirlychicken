@@ -32,15 +32,13 @@ export default class MainScene extends Scene {
     create() {
         this.createAnimations();
 
-        this.bgLayer1 = this.add.image(0, 0, "bg_layer1").setOrigin(0);
-        this.bgLayer1.displayWidth = this.scale.width;
-        this.bgLayer1.displayHeight = this.scale.height;
+        this.bgLayer1 = this.add.image(0, 0, "bg_layer1").setOrigin(0).setScrollFactor(0).setDisplaySize(this.scale.width, this.scale.height);
         this.bgLayer2 = this.add.tileSprite(0, 0, 0, 0, "bg_layer2").setOrigin(0).setScrollFactor(0);
-        this.bgLayer3 = this.add.tileSprite(0, 0, 0, 0, "bg_layer3").setOrigin(0).setScrollFactor(0);
-        this.bgLayer4 = this.add.tileSprite(0, 0, 0, 0, "bg_layer4").setOrigin(0).setScrollFactor(0);
         this.bgLayer2.setScale(this.scale.height / this.bgLayer2.height);
-        this.bgLayer3.setScale(this.scale.height / this.bgLayer3.height);
-        this.bgLayer4.setScale(this.scale.height / this.bgLayer4.height);
+        this.bgLayer3 = this.add.image(0, this.scale.height, "bg_layer3").setOrigin(0, 1);
+        this.bgLayer3.setScale(this.scale.width / this.bgLayer3.width);
+        this.bgLayer4 = this.add.image(0, this.scale.height, "bg_layer4").setOrigin(0, 1);
+        this.bgLayer4.setScale(this.scale.width / this.bgLayer4.width);
 
         Platform.width = 0.08 * this.scale.width;
         Platform.separation = 2 * Platform.width;
@@ -53,35 +51,40 @@ export default class MainScene extends Scene {
         this.platforms.initializeWithSize(10);
         this.spawnPlatforms();
 
-        this.player = new Player(this, 300, 450, "land", 24);
+        this.player = new Player(this, 0.5 * this.scale.width, 0.5 * this.scale.height, "land", 24);
         const collider = this.physics.add.collider(
             this.player,
             this.platforms.getChildren(),
             function (player, platform) {
                 if (player.body.touching.down && platform.body.touching.up) {
-                    console.log("Test");
+                    // console.log("onCollision");
                     player.setVelocityY(-500);
                 }
             }
         );
         collider.overlapOnly = true;
 
+        this.cameras.main.startFollow(this.player, false, 0.05, 0.05);
+
+        this.minPlatformY = Infinity;
+        this.maxPlatformY = -Infinity;
+
         if (!this.game.debug) {
             return;
         }
-        this.infoText = this.add.text(16, 16, "");
-        this.add.text(16, this.scale.height - 16, "UP", { color: "black" })
+        this.infoText = this.add.text(16, 16, "").setScrollFactor(0);
+        this.add.text(16, this.scale.height - 16, "UP", { color: "black" }).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityY(-500);
             });
 
-        this.add.text(64, this.scale.height - 16, "LEFT", { color: "black" })
+        this.add.text(64, this.scale.height - 16, "LEFT", { color: "black" }).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityX(-160);
                 this.player.turnRight();
             });
 
-        this.add.text(144, this.scale.height - 16, "RIGHT", { color: "black" })
+        this.add.text(144, this.scale.height - 16, "RIGHT", { color: "black" }).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityX(160);
                 this.player.turnLeft();
@@ -97,17 +100,35 @@ export default class MainScene extends Scene {
 
     update(time, delta) {
         this.bgLayer2.tilePositionX -= .5;
-        this.bgLayer3.tilePositionX -= .25;
-        this.bgLayer4.tilePositionX += .05;
 
+        this.physics.world.setBounds(0, -this.player.deltaY, this.scale.width, this.scale.height + this.player.deltaY);
+        this.cameras.main.setBounds(
+            this.physics.world.bounds.x,
+            this.physics.world.bounds.y,
+            this.physics.world.bounds.width,
+            this.physics.world.bounds.height
+        );
+
+        let nPlatformsDespawned = 0;
+        this.platforms.getChildren().forEach((e) => {
+            if (!e.active) return;
+
+            this.minPlatformY = Math.min(this.minPlatformY, e.y);
+            this.maxPlatformY = Math.max(this.maxPlatformY, e.y);
+
+            // Recycle out-of-view platforms
+            if (e.y > this.cameras.main.scrollY + this.scale.height) {
+                this.platforms.despawn(e);
+                nPlatformsDespawned++;
+            }
+        });
+
+        range(nPlatformsDespawned).forEach(() => {
+            this.minPlatformY = this.spawnPlatform(this.minPlatformY - Platform.separation).y;
+        });
+
+        this.player.update();
         this.physics.world.wrap(this.player);
-
-        if (!this.platforms) {
-            return;
-        }
-
-        // TODO Recycle platforms
-
 
 
         if (!this.game.debug) {
@@ -130,11 +151,11 @@ export default class MainScene extends Scene {
 
     spawnPlatforms() {
         range(Math.floor(this.scale.height / Platform.separation)).forEach((e, i) => {
-            this.createPlatform(this.scale.height - Platform.separation - Platform.separation * i);
+            this.spawnPlatform(this.scale.height - Platform.separation - Platform.separation * i);
         });
     }
 
-    createPlatform(y) {
+    spawnPlatform(y) {
         if (!this.platforms) {
             return null;
         }
