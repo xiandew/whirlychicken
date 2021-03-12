@@ -116,17 +116,15 @@ export default class Platform extends Phaser.GameObjects.Container {
 
         this.add(components);
 
-        let bodyType = Phaser.Physics.Arcade.STATIC_BODY;
-        if (this.baseFrame == "wingMan1.png" || this.baseFrame == "ground_cake.png") {
-            bodyType = Phaser.Physics.Arcade.DYNAMIC_BODY;
-        }
-        this.scene.physics.add.existing(this, bodyType);
+        this.scene.physics.add.existing(this, Phaser.Physics.Arcade.DYNAMIC_BODY);
         this.body.pushable = false;
+        this.body.setAllowGravity(false);
+        this.body.setCollideWorldBounds(true);
+        this.body.checkCollision.top = false;
+        this.body.checkCollision.bottom = false;
 
-        if (bodyType == Phaser.Physics.Arcade.DYNAMIC_BODY) {
-            this.body.setAllowGravity(false);
+        if (this.baseFrame == "wingMan1.png" || this.baseFrame == "ground_cake.png") {
             this.body.setVelocityX(100);
-            this.body.setCollideWorldBounds(true);
             this.body.bounce.setTo(1, 1);
         }
     }
