@@ -18,7 +18,7 @@ export default class Main extends Phaser.Game {
             physics: {
                 default: "arcade",
                 arcade: {
-                    gravity: { y: 300 },
+                    gravity: { y: 500 },
                     debug: true
                 }
             },
@@ -28,6 +28,7 @@ export default class Main extends Phaser.Game {
             // scene: [HomeScene, MainScene, RankScene, GameEnded],
             scene: MainScene
         });
+        this.debug = true;
 
         const aspectRatio = 568 / 320;
         if (this.config.height / this.config.width > aspectRatio) {

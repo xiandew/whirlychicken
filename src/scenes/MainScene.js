@@ -1,6 +1,7 @@
 import "./MainScene/utils/Pool";
 import Scene from "./Scene";
 import Platform from "./MainScene/Platform";
+import Player from "./MainScene/Player";
 
 const INFO_FORMAT =
     "FPS:        %1\n" +
@@ -52,52 +53,42 @@ export default class MainScene extends Scene {
         this.platforms.initializeWithSize(10);
         this.spawnPlatforms();
 
-        this.player = this.physics.add.sprite(300, 450, 'land', 24).setOrigin(0.71, 0.5);
-        this.player.setScale(3 * Platform.width / this.player.width);
-        this.player.body.setSize(50, 90);
-        // this.player.setBounce(0.2);
-        this.player.setCollideWorldBounds(true);
-        this.player.turnLeft = function () {
-            this.setScale(Math.abs(this.scaleX), this.scaleY);
-            this.body.setOffset(80, 0);
-        }
-        this.player.turnRight = function () {
-            this.setScale(Math.abs(this.scaleX) * -1, this.scaleY);
-            this.body.setOffset(130, 0);
-        }
-        this.player.turnLeft();
-
+        this.player = new Player(this, 300, 450, "land", 24);
         const collider = this.physics.add.collider(
             this.player,
             this.platforms.getChildren(),
             function (player, platform) {
                 if (player.body.touching.down && platform.body.touching.up) {
-                    // console.log("Test");
+                    console.log("Test");
+                    player.setVelocityY(-500);
                 }
             }
         );
         collider.overlapOnly = true;
 
+        if (!this.game.debug) {
+            return;
+        }
         this.infoText = this.add.text(16, 16, "");
         this.add.text(16, this.scale.height - 16, "UP", { color: "black" })
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
-                this.player.setVelocityY(-330);
+                this.player.setVelocityY(-500);
             });
 
         this.add.text(64, this.scale.height - 16, "LEFT", { color: "black" })
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
-                // this.player.setVelocityX(-160);
+                this.player.setVelocityX(-160);
                 this.player.turnRight();
             });
 
         this.add.text(144, this.scale.height - 16, "RIGHT", { color: "black" })
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
-                // player.setVelocityX(160);
+                this.player.setVelocityX(160);
                 this.player.turnLeft();
                 this.player.anims.play("takeoff", true).on("animationcomplete", () => {
                     this.player.off("animationcomplete");
-                    this.player.anims.play('flying', true).on("animationcomplete", () => {
-                        this.player.anims.play('land', true);
+                    this.player.anims.play("flying", true).on("animationcomplete", () => {
+                        this.player.anims.play("land", true);
                         this.player.off("animationcomplete");
                     });
                 });
@@ -109,11 +100,17 @@ export default class MainScene extends Scene {
         this.bgLayer3.tilePositionX -= .25;
         this.bgLayer4.tilePositionX += .05;
 
+        this.physics.world.wrap(this.player);
+
         if (!this.platforms) {
             return;
         }
 
-        if (!this.infoText) {
+        // TODO Recycle platforms
+
+
+
+        if (!this.game.debug) {
             return;
         }
         const size = this.platforms.getLength();
