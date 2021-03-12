@@ -1,17 +1,17 @@
 import Phaser from "../../libs/phaser-full.min";
 
 const groundFrames = [
-    // "ground_cake.png", // Periodically harmful √
-    // "ground_grass.png", // Normal √
-    // "ground_sand.png", // Once off
-    // "ground_snow.png", // Periodically invisible √
-    // "ground_stone.png", // With spikes √
-    "ground_wood.png" // Spring
+    "ground_cake.png", // Periodically harmful √
+    "ground_grass.png", // Normal √
+    "ground_sand.png", // Once off
+    "ground_snow.png", // Periodically invisible √
+    "ground_stone.png", // With spikes √
+    "ground_wood.png" // Spring √
 ];
 
 const otherFrames = [
-    // "wingMan1.png" // Mobile √
-    // "cloud.png", // Fake √
+    "wingMan1.png", // Mobile √
+    "cloud.png", // Fake √
 ];
 
 const bonusFrame = "carrot.png";
@@ -55,10 +55,10 @@ export default class Platform extends Phaser.GameObjects.Container {
                     displayHeight: { start: mushroom.displayHeight, to: 0 },
                     ease: "Power2",
                     yoyo: true,
-                    hold: 1000,
+                    hold: 1000, // Not having the mushroom 
                     onYoyo: () => { if (!this.harmful) this.harmful = true; },
                     repeat: -1,
-                    repeatDelay: 2000,
+                    repeatDelay: 1000, // having the mushroom
                     onRepeat: () => { if (this.harmful) this.harmful = false; }
                 });
 
@@ -70,11 +70,12 @@ export default class Platform extends Phaser.GameObjects.Container {
             case "ground_snow.png":
                 this.scene.tweens.add({
                     targets: ground,
-                    duration: 800,
+                    duration: 600,
                     alpha: 0,
                     ease: "Power2",
                     yoyo: true,
                     repeat: -1,
+                    repeatDelay: 400
                 });
 
                 break;
@@ -112,7 +113,7 @@ export default class Platform extends Phaser.GameObjects.Container {
         this.add(components);
 
         let bodyType = Phaser.Physics.Arcade.STATIC_BODY;
-        if (this.baseFrame == "wingMan1.png" || this.baseFrame == "sun1.png") {
+        if (this.baseFrame == "wingMan1.png" || this.baseFrame == "ground_cake.png") {
             bodyType = Phaser.Physics.Arcade.DYNAMIC_BODY;
         }
         this.scene.physics.add.existing(this, bodyType);
