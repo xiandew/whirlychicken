@@ -20,7 +20,8 @@ class Pool extends Phaser.GameObjects.Group {
         if (spawnExisting) {
             obj.setVisible(true);
             obj.setActive(true);
-            obj.world && obj.world.add(obj.body);
+            if (obj.world) obj.world.add(obj.body);
+            else if (obj.body) obj.body.setEnable();
         }
 
         return obj;
@@ -32,7 +33,8 @@ class Pool extends Phaser.GameObjects.Group {
         obj.alpha = 1;
         obj.scale = 1;
         obj.removeInteractive();
-        obj.world && obj.world.remove(obj.body);
+        if (obj.world) obj.world.remove(obj.body);
+        else if (obj.body) obj.body.setEnable(false);
     }
 
     initializeWithSize(size) {

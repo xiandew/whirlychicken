@@ -20,10 +20,16 @@ export default class Platform extends Phaser.GameObjects.Container {
     constructor(scene, x, y) {
         super(scene, x, y);
         scene.add.existing(this);
+
+        this.tweens = [];
+        this.anims = [];
     }
 
     init() {
+        this.tweens.forEach((e) => e.remove());
+        this.anims.forEach((e) => e.stop());
         this.iterate((e) => Platform.sprites.despawn(e));
+        this.removeAll();
 
         this.baseFrame = randomChoice(groundFrames.concat(otherFrames));
 
@@ -48,19 +54,21 @@ export default class Platform extends Phaser.GameObjects.Container {
                 ground.setY(.2 * mushroom.displayHeight);
 
                 this.harmful = false;
-                this.scene.tweens.add({
-                    targets: mushroom,
-                    duration: 400,
-                    displayWidth: { start: mushroom.displayWidth, to: 0 },
-                    displayHeight: { start: mushroom.displayHeight, to: 0 },
-                    ease: "Power2",
-                    yoyo: true,
-                    hold: 1000, // Not having the mushroom 
-                    onYoyo: () => { if (!this.harmful) this.harmful = true; },
-                    repeat: -1,
-                    repeatDelay: 1000, // having the mushroom
-                    onRepeat: () => { if (this.harmful) this.harmful = false; }
-                });
+                this.tweens.push(
+                    this.scene.tweens.add({
+                        targets: mushroom,
+                        duration: 400,
+                        displayWidth: { start: mushroom.displayWidth, to: 0 },
+                        displayHeight: { start: mushroom.displayHeight, to: 0 },
+                        ease: "Power2",
+                        yoyo: true,
+                        hold: 1000, // Not having the mushroom 
+                        onYoyo: () => { if (!this.harmful) this.harmful = true; },
+                        repeat: -1,
+                        repeatDelay: 1000, // having the mushroom
+                        onRepeat: () => { if (this.harmful) this.harmful = false; }
+                    })
+                );
 
                 break;
             case "ground_grass.png":
@@ -68,15 +76,17 @@ export default class Platform extends Phaser.GameObjects.Container {
             case "ground_sand.png":
                 break;
             case "ground_snow.png":
-                this.scene.tweens.add({
-                    targets: ground,
-                    duration: 600,
-                    alpha: 0,
-                    ease: "Power2",
-                    yoyo: true,
-                    repeat: -1,
-                    repeatDelay: 400
-                });
+                this.tweens.push(
+                    this.scene.tweens.add({
+                        targets: ground,
+                        duration: 600,
+                        alpha: 0,
+                        ease: "Power2",
+                        yoyo: true,
+                        repeat: -1,
+                        repeatDelay: 400
+                    })
+                );
 
                 break;
             case "ground_stone.png":
@@ -103,7 +113,7 @@ export default class Platform extends Phaser.GameObjects.Container {
                 wingman.setScale(Platform.width / wingman.width);;
                 components.push(wingman);
 
-                wingman.anims.play("wingmanflying");
+                this.anims.push(wingman.anims.play("wingmanflying"));
                 break;
             case "cloud.png":
                 const cloud = Platform.sprites.spawn();
@@ -117,15 +127,16 @@ export default class Platform extends Phaser.GameObjects.Container {
         this.add(components);
 
         this.scene.physics.add.existing(this, Phaser.Physics.Arcade.DYNAMIC_BODY);
+        this.body.setSize(this.width, this.height);
         this.body.pushable = false;
         this.body.setAllowGravity(false);
         this.body.setCollideWorldBounds(true);
-        this.body.checkCollision.top = false;
-        this.body.checkCollision.bottom = false;
+        this.body.bounce.setTo(1, 1);
 
         if (this.baseFrame == "wingMan1.png" || this.baseFrame == "ground_cake.png") {
             this.body.setVelocityX(100);
-            this.body.bounce.setTo(1, 1);
+        } else {
+            this.body.setVelocityX(0);
         }
     }
 

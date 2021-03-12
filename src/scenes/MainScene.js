@@ -64,6 +64,7 @@ export default class MainScene extends Scene {
         );
         collider.overlapOnly = true;
 
+        // TODO set lerp after player starts falling
         this.cameras.main.startFollow(this.player, false, 0.05, 0.05);
 
         this.minPlatformY = Infinity;
