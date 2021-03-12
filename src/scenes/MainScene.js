@@ -1,7 +1,4 @@
 import Scene from "./Scene";
-import Chess from "./MainScene/Chess";
-import Board from "./MainScene/Board";
-import Tile from "./MainScene/Tile";
 import "./MainScene/utils/Pool";
 import Platform from "./MainScene/Platform";
 
