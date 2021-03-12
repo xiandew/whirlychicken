@@ -6,12 +6,4 @@ export default class Scene extends Phaser.Scene {
         super(config);
         this.audio = Audio.getInstance();
     }
-
-    autoDisplayHeight(image) {
-        return image.height / image.width * image.displayWidth;
-    }
-
-    autoDisplayWidth(image) {
-        return image.width / image.height * image.displayHeight;
-    }
 }

@@ -6,6 +6,7 @@ import "./MainScene/utils/Pool";
 import Platform from "./MainScene/Platform";
 
 const INFO_FORMAT =
+    "FPS:        %4\n" +
     "Size:       %1\n" +
     "Spawned:    %2\n" +
     "Despawned:  %3\n";
@@ -36,12 +37,9 @@ export default class MainScene extends Scene {
         this.bgLayer2 = this.add.tileSprite(0, 0, 0, 0, "bg_layer2").setOrigin(0).setScrollFactor(0);
         this.bgLayer3 = this.add.tileSprite(0, 0, 0, 0, "bg_layer3").setOrigin(0).setScrollFactor(0);
         this.bgLayer4 = this.add.tileSprite(0, 0, 0, 0, "bg_layer4").setOrigin(0).setScrollFactor(0);
-        this.bgLayer2.displayHeight = this.scale.height;
-        this.bgLayer3.displayHeight = this.scale.height;
-        this.bgLayer4.displayHeight = this.scale.height;
-        this.bgLayer2.displayWidth = this.autoDisplayWidth(this.bgLayer2);
-        this.bgLayer3.displayWidth = this.autoDisplayWidth(this.bgLayer3);
-        this.bgLayer4.displayWidth = this.autoDisplayWidth(this.bgLayer4);
+        this.bgLayer2.setScale(this.scale.height / this.bgLayer2.height);
+        this.bgLayer3.setScale(this.scale.height / this.bgLayer3.height);
+        this.bgLayer4.setScale(this.scale.height / this.bgLayer4.height);
 
         Platform.width = 0.08 * this.scale.width;
         Platform.separation = 2 * Platform.width;
@@ -50,8 +48,7 @@ export default class MainScene extends Scene {
         this.spawnPlatforms(10);
 
         this.player = this.physics.add.sprite(300, 450, 'land', 24).setOrigin(0.71, 0.5);
-        this.player.displayWidth = 3 * Platform.width;
-        this.player.displayHeight = this.autoDisplayHeight(this.player);
+        this.player.setScale(3 * Platform.width / this.player.width);
         this.player.body.setSize(50, 90);
         // this.player.setBounce(0.2);
         this.player.setCollideWorldBounds(true);
@@ -102,7 +99,7 @@ export default class MainScene extends Scene {
             });
     }
 
-    update() {
+    update(time, delta) {
         this.bgLayer2.tilePositionX -= .5;
         this.bgLayer3.tilePositionX -= .25;
         this.bgLayer4.tilePositionX += .05;
@@ -116,7 +113,10 @@ export default class MainScene extends Scene {
         }
         const size = this.platforms.getLength();
         const used = this.platforms.getTotalUsed();
-        const text = Phaser.Utils.String.Format(INFO_FORMAT, [size, used, size - used]);
+        const text = Phaser.Utils.String.Format(
+            INFO_FORMAT,
+            [size, used, size - used, (1000 / delta).toFixed(3)]
+        );
         this.infoText.setText(text);
     }
 

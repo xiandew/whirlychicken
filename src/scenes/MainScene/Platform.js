@@ -1,17 +1,17 @@
 import Phaser from "../../libs/phaser-full.min";
 
 const groundFrames = [
+    // "ground_cake.png", // Periodically harmful √
     // "ground_grass.png", // Normal √
     // "ground_sand.png", // Once off
-    // "ground_snow.png", // Periodically invisible
+    // "ground_snow.png", // Periodically invisible √
     // "ground_stone.png", // With spikes √
-    // "ground_wood.png" // Spring
+    "ground_wood.png" // Spring
 ];
 
 const otherFrames = [
     // "wingMan1.png" // Mobile √
-    // "sun1.png", // Periodically harmful
-    // "cloud.png", // Fake
+    // "cloud.png", // Fake √
 ];
 
 const bonusFrame = "carrot.png";
@@ -20,6 +20,8 @@ export default class Platform extends Phaser.GameObjects.Container {
     constructor(scene, x, y) {
         super(scene, x, y);
         scene.add.existing(this);
+
+        // TODO image pool
     }
 
     init() {
@@ -32,40 +34,72 @@ export default class Platform extends Phaser.GameObjects.Container {
         let ground;
         if (groundFrames.includes(this.baseFrame)) {
             ground = this.scene.add.image(0, 0, "spritesheet_jumper", this.baseFrame);
-            ground.displayWidth = Platform.width;
-            ground.displayHeight = this.scene.autoDisplayHeight(ground);
+            ground.setScale(Platform.width / ground.width);
             components.push(ground);
         }
 
         switch (this.baseFrame) {
+            case "ground_cake.png":
+                const mushroom = this.scene.add.sprite(0, 0, "spritesheet_jumper", "mushroom_red.png");
+                mushroom.setScale(0.5 * Platform.width / mushroom.width);
+                components.unshift(mushroom);
+
+                mushroom.setY(-.2 * mushroom.displayHeight);
+                ground.setY(.2 * mushroom.displayHeight);
+
+                this.harmful = false;
+                this.scene.tweens.add({
+                    targets: mushroom,
+                    duration: 400,
+                    displayWidth: { start: mushroom.displayWidth, to: 0 },
+                    displayHeight: { start: mushroom.displayHeight, to: 0 },
+                    ease: "Power2",
+                    yoyo: true,
+                    hold: 1000,
+                    onYoyo: () => { if (!this.harmful) this.harmful = true; },
+                    repeat: -1,
+                    repeatDelay: 2000,
+                    onRepeat: () => { if (this.harmful) this.harmful = false; }
+                });
+
+                break;
             case "ground_grass.png":
                 break;
             case "ground_sand.png":
                 break;
             case "ground_snow.png":
+                this.scene.tweens.add({
+                    targets: ground,
+                    duration: 800,
+                    alpha: 0,
+                    ease: "Power2",
+                    yoyo: true,
+                    repeat: -1,
+                });
+
                 break;
             case "ground_stone.png":
                 const spikes = this.scene.add.image(0, 0, "spritesheet_jumper", "spikes_top.png");
-                spikes.displayWidth = 0.8 * Platform.width;
-                spikes.displayHeight = this.scene.autoDisplayHeight(spikes);
+                spikes.setScale(0.8 * Platform.width / spikes.width);
                 components.unshift(spikes);
 
-                ground.setY(0.4 * spikes.displayHeight);
+                spikes.setY(-.2 * spikes.displayHeight);
+                ground.setY(0.2 * spikes.displayHeight);
                 break;
             case "ground_wood.png":
                 break;
             case "wingMan1.png":
-
                 const wingman = this.scene.add.sprite(0, 0, "spritesheet_jumper", this.baseFrame);
-                wingman.displayWidth = Platform.width;
-                wingman.displayHeight = this.scene.autoDisplayHeight(wingman);
+                wingman.setScale(Platform.width / wingman.width);;
                 components.push(wingman);
 
                 wingman.anims.play("wingmanflying");
                 break;
-            case "sun1.png":
-                break;
             case "cloud.png":
+                const cloud = this.scene.add.sprite(0, 0, "spritesheet_jumper", this.baseFrame);
+                cloud.setScale(Platform.width / cloud.width);
+                components.push(cloud);
+
                 break;
         }
 
@@ -76,10 +110,10 @@ export default class Platform extends Phaser.GameObjects.Container {
             bodyType = Phaser.Physics.Arcade.DYNAMIC_BODY;
         }
         this.scene.physics.add.existing(this, bodyType);
-        this.body.setAllowGravity(false);
         this.body.pushable = false;
 
         if (bodyType == Phaser.Physics.Arcade.DYNAMIC_BODY) {
+            this.body.setAllowGravity(false);
             this.body.setVelocityX(100);
             this.body.setCollideWorldBounds(true);
             this.body.bounce.setTo(1, 1);
