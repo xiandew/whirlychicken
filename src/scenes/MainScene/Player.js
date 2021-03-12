@@ -10,19 +10,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setOrigin(0.71, 0.5);
         this.setScale(3 * Platform.width / this.width);
         this.body.setSize(50, 90);
-        this.turnLeft();
-        this.setCollideWorldBounds(true);
+        this.turnRight();
 
+        this.alive = true;
         this.startY = this.y;
         this.deltaY = 0;
     }
 
-    turnLeft() {
+    turnRight() {
         this.setScale(Math.abs(this.scaleX), this.scaleY);
         this.body.setOffset(80, 0);
     }
 
-    turnRight() {
+    turnLeft() {
         this.setScale(Math.abs(this.scaleX) * -1, this.scaleY);
         this.body.setOffset(130, 0);
     }

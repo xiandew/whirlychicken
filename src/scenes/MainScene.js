@@ -57,18 +57,20 @@ export default class MainScene extends Scene {
             this.platforms.getChildren(),
             function (player, platform) {
                 if (player.body.touching.down && platform.body.touching.up) {
-                    // console.log("onCollision");
                     player.setVelocityY(-500);
+                    player.off("animationcomplete");
+                    player.anims.play("takeoff", true).on("animationcomplete", () => {
+                        player.off("animationcomplete");
+                        player.anims.play("flying", true);
+                    });
                 }
             }
         );
         collider.overlapOnly = true;
 
-        // TODO set lerp after player starts falling
-        this.cameras.main.startFollow(this.player, false, 0.05, 0.05);
+        this.cameras.main.startFollow(this.player, false);
 
         this.minPlatformY = Infinity;
-        this.maxPlatformY = -Infinity;
 
         if (!this.game.debug) {
             return;
@@ -82,27 +84,25 @@ export default class MainScene extends Scene {
         this.add.text(64, this.scale.height - 16, "LEFT", { color: "black" }).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityX(-160);
-                this.player.turnRight();
+                this.player.turnLeft();
             });
 
         this.add.text(144, this.scale.height - 16, "RIGHT", { color: "black" }).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityX(160);
-                this.player.turnLeft();
-                this.player.anims.play("takeoff", true).on("animationcomplete", () => {
-                    this.player.off("animationcomplete");
-                    this.player.anims.play("flying", true).on("animationcomplete", () => {
-                        this.player.anims.play("land", true);
-                        this.player.off("animationcomplete");
-                    });
-                });
+                this.player.turnRight();
             });
     }
 
     update(time, delta) {
         this.bgLayer2.tilePositionX -= .5;
 
-        this.physics.world.setBounds(0, -this.player.deltaY, this.scale.width, this.scale.height + this.player.deltaY);
+        this.physics.world.setBounds(
+            0,
+            -this.player.deltaY,
+            this.scale.width,
+            Math.min(2 * this.scale.height, this.scale.height + this.player.deltaY)
+        );
         this.cameras.main.setBounds(
             this.physics.world.bounds.x,
             this.physics.world.bounds.y,
@@ -110,7 +110,20 @@ export default class MainScene extends Scene {
             this.physics.world.bounds.height
         );
 
+        if (this.player.alive) {
+            this.bgLayer3.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
+            this.bgLayer4.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
+        }
+
+        this.player.update();
+        this.physics.world.wrap(this.player);
+
+        if (!this.player.alive && this.maxPlatformY < this.cameras.main.scrollY) {
+            return;
+        }
+
         let nPlatformsDespawned = 0;
+        this.maxPlatformY = -Infinity;
         this.platforms.getChildren().forEach((e) => {
             if (!e.active) return;
 
@@ -128,9 +141,10 @@ export default class MainScene extends Scene {
             this.minPlatformY = this.spawnPlatform(this.minPlatformY - Platform.separation).y;
         });
 
-        this.player.update();
-        this.physics.world.wrap(this.player);
-
+        if (this.player.alive && this.player.y > this.maxPlatformY) {
+            this.player.alive = false;
+            this.player.setCollideWorldBounds(true);
+        }
 
         if (!this.game.debug) {
             return;
@@ -190,6 +204,7 @@ export default class MainScene extends Scene {
                 frames: range(4, 13)
             }),
             frameRate: 20,
+            repeat: -1
         });
 
         this.anims.create({
