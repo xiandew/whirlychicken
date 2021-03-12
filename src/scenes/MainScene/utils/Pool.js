@@ -44,8 +44,8 @@ class Pool extends Phaser.GameObjects.Group {
             key: this.defaultKey,
             frame: this.defaultFrame,
             quantity: size,
-            // visible: false,
-            // active: false
+            visible: false,
+            active: false
         });
     }
 }

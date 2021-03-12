@@ -1,5 +1,5 @@
-import Scene from "./Scene";
 import "./MainScene/utils/Pool";
+import Scene from "./Scene";
 import Platform from "./MainScene/Platform";
 
 const INFO_FORMAT =
@@ -40,9 +40,14 @@ export default class MainScene extends Scene {
 
         Platform.width = 0.08 * this.scale.width;
         Platform.separation = 2 * Platform.width;
+        Platform.sprites = this.add.pool({
+            classType: Phaser.GameObjects.Sprite,
+            defaultKey: "spritesheet_jumper"
+        });
+        Platform.sprites.initializeWithSize(20);
         this.platforms = this.add.pool({ classType: Platform });
         this.platforms.initializeWithSize(10);
-        this.spawnPlatforms(10);
+        this.spawnPlatforms();
 
         this.player = this.physics.add.sprite(300, 450, 'land', 24).setOrigin(0.71, 0.5);
         this.player.setScale(3 * Platform.width / this.player.width);

@@ -20,12 +20,10 @@ export default class Platform extends Phaser.GameObjects.Container {
     constructor(scene, x, y) {
         super(scene, x, y);
         scene.add.existing(this);
-
-        // TODO image pool
     }
 
     init() {
-        this.removeAll();
+        this.iterate((e) => Platform.sprites.despawn(e));
 
         this.baseFrame = randomChoice(groundFrames.concat(otherFrames));
 
@@ -33,14 +31,16 @@ export default class Platform extends Phaser.GameObjects.Container {
 
         let ground;
         if (groundFrames.includes(this.baseFrame)) {
-            ground = this.scene.add.image(0, 0, "spritesheet_jumper", this.baseFrame);
+            ground = Platform.sprites.spawn();
+            ground.setFrame(this.baseFrame);
             ground.setScale(Platform.width / ground.width);
             components.push(ground);
         }
 
         switch (this.baseFrame) {
             case "ground_cake.png":
-                const mushroom = this.scene.add.sprite(0, 0, "spritesheet_jumper", "mushroom_red.png");
+                const mushroom = Platform.sprites.spawn();
+                mushroom.setFrame("mushroom_red.png");
                 mushroom.setScale(0.5 * Platform.width / mushroom.width);
                 components.unshift(mushroom);
 
@@ -80,7 +80,8 @@ export default class Platform extends Phaser.GameObjects.Container {
 
                 break;
             case "ground_stone.png":
-                const spikes = this.scene.add.image(0, 0, "spritesheet_jumper", "spikes_top.png");
+                const spikes = Platform.sprites.spawn();
+                spikes.setFrame("spikes_top.png");
                 spikes.setScale(0.8 * Platform.width / spikes.width);
                 components.unshift(spikes);
 
@@ -88,7 +89,8 @@ export default class Platform extends Phaser.GameObjects.Container {
                 ground.setY(0.2 * spikes.displayHeight);
                 break;
             case "ground_wood.png":
-                const spring = this.scene.add.sprite(0, 0, "spritesheet_jumper", "spring.png");
+                const spring = Platform.sprites.spawn();
+                spring.setFrame("spring.png");
                 spring.setScale(0.7 * Platform.width / spring.width);
                 components.unshift(spring);
 
@@ -96,14 +98,16 @@ export default class Platform extends Phaser.GameObjects.Container {
                 ground.setY(0.35 * spring.displayHeight);
                 break;
             case "wingMan1.png":
-                const wingman = this.scene.add.sprite(0, 0, "spritesheet_jumper", this.baseFrame);
+                const wingman = Platform.sprites.spawn();
+                wingman.setFrame(this.baseFrame);
                 wingman.setScale(Platform.width / wingman.width);;
                 components.push(wingman);
 
                 wingman.anims.play("wingmanflying");
                 break;
             case "cloud.png":
-                const cloud = this.scene.add.sprite(0, 0, "spritesheet_jumper", this.baseFrame);
+                const cloud = Platform.sprites.spawn();
+                cloud.setFrame(this.baseFrame);
                 cloud.setScale(Platform.width / cloud.width);
                 components.push(cloud);
 
