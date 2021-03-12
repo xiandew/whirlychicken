@@ -176,6 +176,14 @@ export default class MainScene extends Scene {
             yoyo: true,
             repeat: -1
         });
+
+        this.anims.create({
+            key: "springinout",
+            frames: this.anims.generateFrameNumbers("spritesheet_jumper", {
+                frames: ["spring.png", "spring_in.png", "spring_out.png"]
+            }),
+            frameRate: 20
+        });
     }
 }
 

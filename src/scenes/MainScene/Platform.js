@@ -87,6 +87,12 @@ export default class Platform extends Phaser.GameObjects.Container {
                 ground.setY(0.2 * spikes.displayHeight);
                 break;
             case "ground_wood.png":
+                const spring = this.scene.add.sprite(0, 0, "spritesheet_jumper", "spring.png");
+                spring.setScale(0.7 * Platform.width / spring.width);
+                components.unshift(spring);
+
+                spring.setY(-.35 * spring.displayHeight);
+                ground.setY(0.35 * spring.displayHeight);
                 break;
             case "wingMan1.png":
                 const wingman = this.scene.add.sprite(0, 0, "spritesheet_jumper", this.baseFrame);
