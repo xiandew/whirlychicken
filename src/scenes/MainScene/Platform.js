@@ -3,7 +3,7 @@ import Phaser from "../../libs/phaser-full.min";
 const groundFrames = [
     "ground_cake.png", // Periodically harmful √
     "ground_grass.png", // Normal √
-    "ground_sand.png", // Once off
+    "ground_sand_broken.png", // Once off
     "ground_snow.png", // Periodically invisible √
     "ground_stone.png", // With spikes √
     "ground_wood.png" // Spring √
@@ -97,8 +97,22 @@ export default class Platform extends Phaser.GameObjects.Container {
                 break;
             case "ground_grass.png":
                 break;
-            case "ground_sand.png":
-                this.despawnedOnCollision = true;
+            case "ground_sand_broken.png":
+                this.particleManagers.push(
+                    this.scene.add.particles("spritesheet_jumper", null, {
+                        frame: ["grass_brown1.png", "grass_brown2.png"],
+                        x: this.x,
+                        y: this.y,
+                        angle: { min: 0, max: 180 },
+                        lifespan: { min: 500, max: 1000 },
+                        speed: { min: 50, max: 80 },
+                        gravityY: 100,
+                        alpha: { start: 1, end: 0 },
+                        maxParticles: 15,
+                        scale: { start: 0.3, end: 0 },
+                        on: false
+                    })
+                );
 
                 break;
             case "ground_snow.png":
@@ -127,6 +141,8 @@ export default class Platform extends Phaser.GameObjects.Container {
                 ground.setY(0.2 * spikes.displayHeight);
                 break;
             case "ground_wood.png":
+                this.bounceFactor *= 3;
+
                 const spring = Platform.sprites.spawn();
                 spring.setFrame("spring.png");
                 spring.setScale(0.7 * Platform.width / spring.width);
@@ -191,11 +207,21 @@ export default class Platform extends Phaser.GameObjects.Container {
         this.onCollisionAnims.forEach(({ sprite, animKey }) => {
             this.anims.push(sprite.play(animKey, true));
         });
+
+        if (this.baseFrame == "ground_sand_broken.png") {
+            this.playParticles();
+            this.body.setEnable(false);
+        }
     }
 
     onOverlap() {
+        this.playParticles();
+    }
+
+    playParticles() {
         if (!this.visible) return;
         this.setVisible(false);
+
         this.particleManagers.forEach((e) => {
             e.emitters.list.forEach((e2) => e2.start())
         });
