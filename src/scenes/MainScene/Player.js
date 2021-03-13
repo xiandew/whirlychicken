@@ -17,6 +17,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setScale(3 * Platform.width / this.width);
         this.body.setSize(50, 90);
         this.turnRight();
+        this.body.checkCollision.up = false;
+        this.body.checkCollision.left = false;
+        this.body.checkCollision.right = false;
 
         this.state = Player.State.JUMPING;
         this.startY = this.y;

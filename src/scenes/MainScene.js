@@ -59,6 +59,7 @@ export default class MainScene extends Scene {
         this.spawnPlatforms();
 
         this.player = new Player(this, 0.5 * this.scale.width, 0.5 * this.scale.height, "land", 24);
+        this.player.anims.play("flying", true);
         const collider = this.physics.add.collider(
             this.player,
             this.platforms.getChildren(),
@@ -66,15 +67,14 @@ export default class MainScene extends Scene {
                 if (player.body.touching.down && platform.body.touching.up) {
                     player.setVelocityY(-500);
 
-                    // player.off("animationcomplete");
-                    // player.anims.play("takeoff", true).on("animationcomplete", () => {
-                    //     player.off("animationcomplete");
-                    //     player.anims.play("flying", true);
-                    // });
+                    player.off("animationcomplete");
+                    player.anims.play("takeoff", true).on("animationcomplete", () => {
+                        player.off("animationcomplete");
+                        player.anims.play("flying", true);
+                    });
                 }
             }
         );
-        collider.overlapOnly = true;
 
         this.cameras.main.startFollow(this.player, false);
 
@@ -84,18 +84,18 @@ export default class MainScene extends Scene {
             return;
         }
         this.infoText = this.add.text(16, 16, "").setScrollFactor(0);
-        this.add.text(16, this.scale.height - 16, "UP", { color: "black" }).setScrollFactor(0)
+        this.add.text(32, this.scale.height, "UP", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityY(-500);
             });
 
-        this.add.text(64, this.scale.height - 16, "LEFT", { color: "black" }).setScrollFactor(0)
+        this.add.text(96, this.scale.height, "LEFT", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityX(-160);
                 this.player.turnLeft();
             });
 
-        this.add.text(144, this.scale.height - 16, "RIGHT", { color: "black" }).setScrollFactor(0)
+        this.add.text(192, this.scale.height, "RIGHT", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityX(160);
                 this.player.turnRight();
