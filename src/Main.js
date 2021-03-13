@@ -4,6 +4,7 @@ import Phaser from "./libs/phaser-full.min";
 import MainScene from "./scenes/MainScene";
 // import RankScene from "./scenes/RankScene";
 // import GameEnded from "./scenes/GameEnded";
+import Audio from "./utils/Audio";
 
 export default class Main extends Phaser.Game {
 
@@ -29,6 +30,7 @@ export default class Main extends Phaser.Game {
             scene: MainScene
         });
         this.debug = true;
+        this.audio = Audio.getInstance();
 
         const aspectRatio = 568 / 320;
         if (this.config.height / this.config.width > aspectRatio) {

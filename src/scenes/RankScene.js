@@ -1,7 +1,7 @@
-import Scene from "./Scene";
+import Phaser from "../libs/phaser-full.min";
 import GameGlobal from "../data/GameGlobal";
 
-export default class RankScene extends Scene {
+export default class RankScene extends Phaser.Scene {
     constructor() {
         super("RankScene");
     }

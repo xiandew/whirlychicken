@@ -1,5 +1,4 @@
 import "./MainScene/utils/Pool";
-import Scene from "./Scene";
 import Platform from "./MainScene/Platform";
 import Player from "./MainScene/Player";
 
@@ -12,7 +11,7 @@ const INFO_FORMAT =
     "Spawned:    %6\n" +
     "Despawned:  %7\n";
 
-export default class MainScene extends Scene {
+export default class MainScene extends Phaser.Scene {
     constructor() {
         super("MainScene");
     }

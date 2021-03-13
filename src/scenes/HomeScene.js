@@ -1,7 +1,7 @@
-import Scene from "./Scene";
+import Phaser from "../libs/phaser-full.min";
 import GameGlobal from "../data/GameGlobal";
 
-export default class HomeScene extends Scene {
+export default class HomeScene extends Phaser.Scene {
     constructor() {
         super("HomeScene");
     }
