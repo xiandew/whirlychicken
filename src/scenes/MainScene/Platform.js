@@ -23,9 +23,13 @@ export default class Platform extends Phaser.GameObjects.Container {
 
         this.tweens = [];
         this.anims = [];
+
+        this.bounceFactor = 500;
+        this.onCollisionAnims = [];
     }
 
     init() {
+        this.onCollisionAnims = [];
         this.tweens.forEach((e) => e.remove());
         this.anims.forEach((e) => e.stop());
         this.iterate((e) => Platform.sprites.despawn(e));
@@ -90,6 +94,8 @@ export default class Platform extends Phaser.GameObjects.Container {
 
                 break;
             case "ground_stone.png":
+                this.harmful = true;
+
                 const spikes = Platform.sprites.spawn();
                 spikes.setFrame("spikes_top.png");
                 spikes.setScale(0.8 * Platform.width / spikes.width);
@@ -104,8 +110,9 @@ export default class Platform extends Phaser.GameObjects.Container {
                 spring.setScale(0.7 * Platform.width / spring.width);
                 components.unshift(spring);
 
-                spring.setY(-.35 * spring.displayHeight);
-                ground.setY(0.35 * spring.displayHeight);
+                ground.setY(0.3 * spring.displayHeight);
+
+                this.onCollisionAnims.push({ sprite: spring, animKey: "springinout" });
                 break;
             case "wingMan1.png":
                 const wingman = Platform.sprites.spawn();
@@ -138,6 +145,12 @@ export default class Platform extends Phaser.GameObjects.Container {
         } else {
             this.body.setVelocityX(0);
         }
+    }
+
+    onCollision() {
+        this.onCollisionAnims.forEach(({ sprite, animKey }) => {
+            this.anims.push(sprite.play(animKey, true));
+        });
     }
 
     add(child) {
