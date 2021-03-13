@@ -23,15 +23,20 @@ export default class Platform extends Phaser.GameObjects.Container {
 
         this.tweens = [];
         this.anims = [];
-
-        this.bounceFactor = 500;
         this.onCollisionAnims = [];
+        this.particleManagers = [];
     }
 
     init() {
+        this.bounceFactor = 500;
+
         this.onCollisionAnims = [];
+        this.particleManagers.forEach((e) => e.destroy());
+        this.particleManagers = [];
         this.tweens.forEach((e) => e.remove());
+        this.tweens = [];
         this.anims.forEach((e) => e.stop());
+        this.anims = [];
         this.iterate((e) => Platform.sprites.despawn(e));
         this.removeAll();
 
@@ -93,6 +98,8 @@ export default class Platform extends Phaser.GameObjects.Container {
             case "ground_grass.png":
                 break;
             case "ground_sand.png":
+                this.despawnedOnCollision = true;
+
                 break;
             case "ground_snow.png":
                 this.tweens.push(
@@ -138,11 +145,28 @@ export default class Platform extends Phaser.GameObjects.Container {
                 this.anims.push(wingman.anims.play("wingmanflying"));
                 break;
             case "cloud.png":
+                this.bounceFactor = 0;
+
                 const cloud = Platform.sprites.spawn();
                 cloud.setFrame(this.baseFrame);
                 cloud.setScale(Platform.width / cloud.width);
                 components.push(cloud);
 
+                this.particleManagers.push(
+                    this.scene.add.particles("spritesheet_jumper", null, {
+                        frame: "smoke.png",
+                        x: this.x,
+                        y: this.y,
+                        angle: { start: 0, end: 180, steps: 36 },
+                        speed: { random: [10, 50] },
+                        gravityY: -100,
+                        lifespan: { min: 1000, max: 2000 },
+                        alpha: { start: 1, end: 0 },
+                        maxParticles: 5,
+                        scale: 0.5,
+                        on: false
+                    })
+                );
                 break;
         }
 
@@ -166,6 +190,14 @@ export default class Platform extends Phaser.GameObjects.Container {
     onCollision() {
         this.onCollisionAnims.forEach(({ sprite, animKey }) => {
             this.anims.push(sprite.play(animKey, true));
+        });
+    }
+
+    onOverlap() {
+        if (!this.visible) return;
+        this.setVisible(false);
+        this.particleManagers.forEach((e) => {
+            e.emitters.list.forEach((e2) => e2.start())
         });
     }
 

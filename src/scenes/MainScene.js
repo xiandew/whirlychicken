@@ -55,20 +55,11 @@ export default class MainScene extends Phaser.Scene {
         Platform.sprites.initializeWithSize(20);
         this.platforms = this.add.pool({ classType: Platform });
         this.platforms.initializeWithSize(10);
-        this.spawnPlatforms();
 
         this.player = new Player(this, 0.5 * this.scale.width, 0.5 * this.scale.height, "land", 24);
         this.player.anims.play("flying", true);
-        this.physics.add.collider(
-            this.player,
-            this.platforms.getChildren(),
-            function (player, platform) {
-                if (player.body.touching.down && platform.body.touching.up) {
-                    player.onCollision(platform);
-                    platform.onCollision();
-                }
-            }
-        );
+
+        this.spawnPlatforms();
 
         this.cameras.main.startFollow(this.player, false);
 
@@ -127,7 +118,7 @@ export default class MainScene extends Phaser.Scene {
             this.maxPlatformY = Math.max(this.maxPlatformY, e.y);
 
             // Recycle out-of-view platforms
-            if (e.y > this.cameras.main.scrollY + this.scale.height) {
+            if (e.y - 0.5 * e.height > this.cameras.main.scrollY + this.scale.height) {
                 this.platforms.despawn(e);
                 nPlatformsDespawned++;
             }
@@ -136,6 +127,27 @@ export default class MainScene extends Phaser.Scene {
         range(nPlatformsDespawned).forEach(() => {
             this.minPlatformY = this.spawnPlatform(this.minPlatformY - Platform.separation).y;
         });
+
+        this.physics.world.collide(
+            this.player,
+            this.platforms.getChildren().filter(e => e.bounceFactor),
+            (player, platform) => {
+                if (player.body.touching.down && platform.body.touching.up) {
+                    player.onCollision(platform);
+                    platform.onCollision();
+                }
+            }
+        );
+
+        this.physics.world.overlap(
+            this.player,
+            this.platforms.getChildren().filter(e => !e.bounceFactor),
+            (player, platform) => {
+                if (player.body.touching.down && platform.body.touching.up) {
+                    platform.onOverlap();
+                }
+            }
+        );
 
         if (this.player.state == Player.State.JUMPING && this.player.y > this.maxPlatformY) {
             this.player.startFalling();
@@ -175,7 +187,7 @@ export default class MainScene extends Phaser.Scene {
 
         const platform = this.platforms.spawn(
             this.scale.width * 0.2 + Phaser.Math.Between(0, this.scale.width * 0.6 - Platform.width),
-            y || 0 // TODO
+            y
         );
 
         if (!platform) {
