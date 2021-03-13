@@ -54,15 +54,20 @@ export default class Platform extends Phaser.GameObjects.Container {
                 mushroom.setScale(0.5 * Platform.width / mushroom.width);
                 components.unshift(mushroom);
 
-                mushroom.setY(-.2 * mushroom.displayHeight);
-                ground.setY(.2 * mushroom.displayHeight);
+                mushroom.setY(.4 * mushroom.displayHeight);
+                ground.setY(.4 * mushroom.displayHeight);
 
+                function getBodySize() {
+                    return 0.5 * ground.displayHeight + mushroom.displayHeight;
+                }
+
+                const maxBodySize = getBodySize();
                 this.harmful = false;
+
                 this.tweens.push(
                     this.scene.tweens.add({
                         targets: mushroom,
                         duration: 400,
-                        displayWidth: { start: mushroom.displayWidth, to: 0 },
                         displayHeight: { start: mushroom.displayHeight, to: 0 },
                         ease: "Power2",
                         yoyo: true,
@@ -70,7 +75,17 @@ export default class Platform extends Phaser.GameObjects.Container {
                         onYoyo: () => { if (!this.harmful) this.harmful = true; },
                         repeat: -1,
                         repeatDelay: 1000, // having the mushroom
-                        onRepeat: () => { if (this.harmful) this.harmful = false; }
+                        onRepeat: () => { if (this.harmful) this.harmful = false; },
+                        onUpdate: () => {
+                            if (!this.body) return;
+                            const currBodySize = getBodySize();
+                            this.body.setSize(
+                                this.body.width,
+                                Math.max(ground.displayHeight, currBodySize)
+                            ).setOffset(
+                                0, maxBodySize - Math.max(ground.displayHeight, currBodySize)
+                            );
+                        }
                     })
                 );
 
@@ -135,6 +150,7 @@ export default class Platform extends Phaser.GameObjects.Container {
 
         this.scene.physics.add.existing(this, Phaser.Physics.Arcade.DYNAMIC_BODY);
         this.body.setSize(this.width, this.height);
+        this.body.setOffset(0, 0);
         this.body.pushable = false;
         this.body.setAllowGravity(false);
         this.body.setCollideWorldBounds(true);
