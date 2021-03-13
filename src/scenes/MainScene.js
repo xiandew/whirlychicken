@@ -59,18 +59,13 @@ export default class MainScene extends Phaser.Scene {
 
         this.player = new Player(this, 0.5 * this.scale.width, 0.5 * this.scale.height, "land", 24);
         this.player.anims.play("flying", true);
-        const collider = this.physics.add.collider(
+        this.physics.add.collider(
             this.player,
             this.platforms.getChildren(),
             function (player, platform) {
                 if (player.body.touching.down && platform.body.touching.up) {
-                    player.setVelocityY(-500);
-
-                    player.off("animationcomplete");
-                    player.anims.play("takeoff", true).on("animationcomplete", () => {
-                        player.off("animationcomplete");
-                        player.anims.play("flying", true);
-                    });
+                    player.onCollision(platform);
+                    platform.onCollision();
                 }
             }
         );

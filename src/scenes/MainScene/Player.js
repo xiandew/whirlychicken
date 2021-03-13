@@ -50,6 +50,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Control player
     }
 
+    onCollision(platform) {
+        this.setVelocityY(-platform.bounceFactor);
+
+        this.off("animationcomplete");
+        this.anims.play("takeoff", true).on("animationcomplete", () => {
+            this.off("animationcomplete");
+            this.anims.play("flying", true);
+        });
+    }
+
     startFalling() {
         this.state = Player.State.FALLING;
         this.anims.play("falling");
