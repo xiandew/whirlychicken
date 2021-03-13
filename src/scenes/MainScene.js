@@ -27,6 +27,13 @@ export default class MainScene extends Scene {
         this.load.spritesheet("flying", "assets/images/npc_chicken__x1_flying_png_1354830387.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("fall", "assets/images/npc_chicken__x1_fall_png_1354830392.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("land", "assets/images/npc_chicken__x1_land_png_1354830389.png", { frameWidth: 148, frameHeight: 110 });
+        this.load.spritesheet("idle1", "assets/images/npc_chicken__x1_idle1_png_1354830404.png", { frameWidth: 148, frameHeight: 110 });
+        this.load.spritesheet("idle2", "assets/images/npc_chicken__x1_idle2_png_1354830405.png", { frameWidth: 148, frameHeight: 110 });
+        this.load.spritesheet("idle3", "assets/images/npc_chicken__x1_idle3_png_1354830407.png", { frameWidth: 148, frameHeight: 110 });
+        this.load.spritesheet("pecking_once", "assets/images/npc_chicken__x1_pecking_once_png_1354830398.png", { frameWidth: 148, frameHeight: 110 });
+        this.load.spritesheet("pecking_twice", "assets/images/npc_chicken__x1_pecking_twice_png_1354830400.png", { frameWidth: 148, frameHeight: 110 });
+        this.load.spritesheet("sit", "assets/images/npc_chicken__x1_sit_png_1354830401.png", { frameWidth: 148, frameHeight: 110 });
+        this.load.spritesheet("walk", "assets/images/npc_chicken__x1_walk_png_1354830385.png", { frameWidth: 148, frameHeight: 110 });
     }
 
     create() {
@@ -58,11 +65,12 @@ export default class MainScene extends Scene {
             function (player, platform) {
                 if (player.body.touching.down && platform.body.touching.up) {
                     player.setVelocityY(-500);
-                    player.off("animationcomplete");
-                    player.anims.play("takeoff", true).on("animationcomplete", () => {
-                        player.off("animationcomplete");
-                        player.anims.play("flying", true);
-                    });
+
+                    // player.off("animationcomplete");
+                    // player.anims.play("takeoff", true).on("animationcomplete", () => {
+                    //     player.off("animationcomplete");
+                    //     player.anims.play("flying", true);
+                    // });
                 }
             }
         );
@@ -97,30 +105,24 @@ export default class MainScene extends Scene {
     update(time, delta) {
         this.bgLayer2.tilePositionX -= .5;
 
+        this.player.update();
+        if (this.player.state != Player.State.JUMPING) {
+            return;
+        }
+
         this.physics.world.setBounds(
             0,
             -this.player.deltaY,
             this.scale.width,
             Math.min(2 * this.scale.height, this.scale.height + this.player.deltaY)
         );
+        this.physics.world.wrap(this.player);
         this.cameras.main.setBounds(
             this.physics.world.bounds.x,
             this.physics.world.bounds.y,
             this.physics.world.bounds.width,
             this.physics.world.bounds.height
         );
-
-        if (this.player.alive) {
-            this.bgLayer3.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
-            this.bgLayer4.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
-        }
-
-        this.player.update();
-        this.physics.world.wrap(this.player);
-
-        if (!this.player.alive && this.maxPlatformY < this.cameras.main.scrollY) {
-            return;
-        }
 
         let nPlatformsDespawned = 0;
         this.maxPlatformY = -Infinity;
@@ -141,9 +143,11 @@ export default class MainScene extends Scene {
             this.minPlatformY = this.spawnPlatform(this.minPlatformY - Platform.separation).y;
         });
 
-        if (this.player.alive && this.player.y > this.maxPlatformY) {
-            this.player.alive = false;
-            this.player.setCollideWorldBounds(true);
+        if (this.player.state == Player.State.JUMPING && this.player.y > this.maxPlatformY) {
+            this.player.startFalling();
+
+            this.bgLayer3.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
+            this.bgLayer4.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
         }
 
         if (!this.game.debug) {
@@ -213,6 +217,65 @@ export default class MainScene extends Scene {
                 frames: range(25)
             }),
             frameRate: 20
+        });
+
+        this.anims.create({
+            key: "falling",
+            frames: this.anims.generateFrameNumbers("fall", { end: 5 }),
+            frameRate: 20,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: "crashland",
+            frames: this.anims.generateFrameNumbers("fall", { frames: range(6, 25) }),
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: "idle1",
+            frames: this.anims.generateFrameNumbers("idle1", { end: 66 }),
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: "idle2",
+            frames: this.anims.generateFrameNumbers("idle2", { end: 46 }),
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: "idle3",
+            frames: this.anims.generateFrameNumbers("idle3", { end: 85 }),
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: "pecking_once",
+            frames: this.anims.generateFrameNumbers("pecking_once", { end: 31 }),
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: "pecking_twice",
+            frames: this.anims.generateFrameNumbers("pecking_twice", { end: 39 }),
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: "sit",
+            frames: this.anims.generateFrameNumbers("sit", {
+                frames: range(20).concat(range(30).map(e => 19))
+            }),
+            frameRate: 20,
+            yoyo: true
+        });
+
+        this.anims.create({
+            key: "walk",
+            frames: this.anims.generateFrameNumbers("walk", { end: 23 }),
+            frameRate: 20,
+            repeat: 3
         });
 
         this.anims.create({
