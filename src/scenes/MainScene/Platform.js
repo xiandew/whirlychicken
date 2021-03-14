@@ -77,6 +77,7 @@ export default class Platform extends Phaser.GameObjects.Container {
 
                 ground.setY(.5 * ground.displayHeight);
 
+                const maxBounceFactor = this.bounceFactor;
                 this.anims.push(fire.anims.play("fire"));
                 this.tweens.push(
                     this.scene.tweens.add({
@@ -91,6 +92,7 @@ export default class Platform extends Phaser.GameObjects.Container {
                         repeatDelay: 1000,
                         onUpdate: (tween, target) => {
                             this.harmful = !!target.displayWidth;
+                            this.bounceFactor = this.harmful ? maxBounceFactor * 0.3 : maxBounceFactor;
                         },
                     })
                 );
@@ -131,7 +133,7 @@ export default class Platform extends Phaser.GameObjects.Container {
 
                 break;
             case "ground_stone.png":
-                this.bounceFactor = 200;
+                this.bounceFactor *= 0.3;
                 this.harmful = true;
 
                 const spikes = Platform.sprites.spawn();
