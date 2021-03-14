@@ -6,6 +6,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         static JUMPING = 1;
         static FALLING = 2;
         static LANDED = 3;
+        static WOUNDING = 4;
+        static WOUNDED = 5;
     }
 
     constructor(scene, x, y, texture, frame) {
@@ -51,7 +53,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     onCollision(platform) {
+        if (this.state != Player.State.JUMPING) return;
+
         this.setVelocityY(-platform.bounceFactor);
+
+        if (platform.harmful) {
+            this.state = Player.State.WOUNDING;
+            this.anims.play("flyback").on("animationcomplete", () => {
+                this.off("animationcomplete");
+                this.state = Player.State.WOUNDED;
+            });
+
+            return;
+        }
 
         this.off("animationcomplete");
         this.anims.play("takeoff", true).on("animationcomplete", () => {

@@ -24,6 +24,7 @@ export default class MainScene extends Phaser.Scene {
         this.load.image("bg_layer4", "assets/images/bg_layer4.png");
         this.load.atlas("spritesheet_jumper", "assets/atlas/spritesheet_jumper.png", "assets/atlas/spritesheet_jumper.json");
         this.load.spritesheet("flying", "assets/images/npc_chicken__x1_flying_png_1354830387.png", { frameWidth: 148, frameHeight: 110 });
+        this.load.spritesheet("flying_back", "assets/images/npc_chicken__x1_flying_back_png_1354830391.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("fall", "assets/images/npc_chicken__x1_fall_png_1354830392.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("land", "assets/images/npc_chicken__x1_land_png_1354830389.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("idle1", "assets/images/npc_chicken__x1_idle1_png_1354830404.png", { frameWidth: 148, frameHeight: 110 });
@@ -33,6 +34,7 @@ export default class MainScene extends Phaser.Scene {
         this.load.spritesheet("pecking_twice", "assets/images/npc_chicken__x1_pecking_twice_png_1354830400.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("sit", "assets/images/npc_chicken__x1_sit_png_1354830401.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("walk", "assets/images/npc_chicken__x1_walk_png_1354830385.png", { frameWidth: 148, frameHeight: 110 });
+        this.load.spritesheet("fire", "assets/images/fire.png", { frameWidth: 128, frameHeight: 128 });
     }
 
     create() {
@@ -91,9 +93,16 @@ export default class MainScene extends Phaser.Scene {
         this.bgLayer2.tilePositionX -= .5;
 
         this.player.update();
-        if (this.player.state != Player.State.JUMPING) {
-            return;
+
+        if (this.player.state == Player.State.JUMPING && this.player.y > this.maxPlatformY ||
+            this.player.state == Player.State.WOUNDED) {
+            this.player.startFalling();
+
+            this.bgLayer3.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
+            this.bgLayer4.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
         }
+
+        if (this.player.state != Player.State.JUMPING) return;
 
         this.physics.world.setBounds(
             0,
@@ -148,13 +157,6 @@ export default class MainScene extends Phaser.Scene {
                 }
             }
         );
-
-        if (this.player.state == Player.State.JUMPING && this.player.y > this.maxPlatformY) {
-            this.player.startFalling();
-
-            this.bgLayer3.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
-            this.bgLayer4.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
-        }
 
         if (!this.game.debug) {
             return;
@@ -216,6 +218,13 @@ export default class MainScene extends Phaser.Scene {
             frameRate: 20,
             repeat: -1
         });
+
+        this.anims.create({
+            key: "flyback",
+            frames: this.anims.generateFrameNumbers("flying_back", { end: 16 }),
+            frameRate: 20
+        });
+
 
         this.anims.create({
             key: "land",
@@ -300,6 +309,13 @@ export default class MainScene extends Phaser.Scene {
                 frames: ["spring.png", "spring_in.png", "spring_out.png"]
             }),
             frameRate: 20
+        });
+
+        this.anims.create({
+            key: "fire",
+            frames: this.anims.generateFrameNumbers("fire"),
+            frameRate: 20,
+            repeat: -1
         });
     }
 }
