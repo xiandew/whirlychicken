@@ -14,7 +14,7 @@ export default class Main extends Phaser.Game {
             canvas: canvas,
             width: screenWidth * pixelRatio,
             height: screenHeight * pixelRatio,
-            backgroundColor: 0xade6ff,
+            backgroundColor: 0xffffff,
             physics: {
                 default: "arcade",
                 arcade: {

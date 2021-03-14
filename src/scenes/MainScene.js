@@ -18,6 +18,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image("bg_layer1", "assets/images/bg_layer1.png");
         this.load.image("bg_layer2", "assets/images/bg_layer2.png");
         this.load.image("bg_layer3", "assets/images/bg_layer3.png");
         this.load.image("bg_layer4", "assets/images/bg_layer4.png");

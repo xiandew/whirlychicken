@@ -13,7 +13,6 @@ export default class HomeScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("bg_layer1", "assets/images/bg_layer1.png");
         this.load.image("rotate-phone", "assets/images/rotate-phone.png");
         this.load.image("start-btn", "assets/images/start-btn.png");
         // this.load.image("continue-btn", "assets/images/continue-btn.png");
@@ -35,8 +34,6 @@ export default class HomeScene extends Phaser.Scene {
 
     create() {
         this.createAnimations();
-
-        this.bgLayer1 = this.add.image(0, 0, "bg_layer1").setOrigin(0).setScrollFactor(0).setDisplaySize(this.scale.width, this.scale.height);
 
         let rotataPhoneIcon = this.add.image(
             0.5 * this.scale.width,
