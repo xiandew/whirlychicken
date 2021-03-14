@@ -35,6 +35,7 @@ export default class MainScene extends Phaser.Scene {
         this.load.spritesheet("sit", "assets/images/npc_chicken__x1_sit_png_1354830401.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("walk", "assets/images/npc_chicken__x1_walk_png_1354830385.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("fire", "assets/images/fire.png", { frameWidth: 128, frameHeight: 128 });
+        this.load.bitmapFont("consolas", "assets/fonts/bitmap/consolas_0.png", "assets/fonts/bitmap/consolas.xml");
     }
 
     create() {
@@ -70,25 +71,25 @@ export default class MainScene extends Phaser.Scene {
 
         // Create score text
         const fontSize = 0.05 * this.scale.width;
-        this.score = this.add.text(fontSize, fontSize, "0", { color: "black" }).setFontSize(fontSize).setOrigin(0).setScrollFactor(0);
+        this.score = this.add.bitmapText(fontSize, fontSize, "consolas", "0", fontSize).setOrigin(0).setScrollFactor(0);
         this.score.value = 0;
 
         if (!this.game.debug) {
             return;
         }
         this.infoText = this.add.text(16, 16, "").setScrollFactor(0);
-        this.add.text(32, this.scale.height, "UP", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
+        this.add.text(32, this.scale.height, "W", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityY(-500);
             });
 
-        this.add.text(96, this.scale.height, "LEFT", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
+        this.add.text(96, this.scale.height, "A", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityX(-160);
                 this.player.turnLeft();
             });
 
-        this.add.text(192, this.scale.height, "RIGHT", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
+        this.add.text(160, this.scale.height, "D", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
                 this.player.setVelocityX(160);
                 this.player.turnRight();
