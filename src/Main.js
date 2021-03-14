@@ -19,7 +19,7 @@ export default class Main extends Phaser.Game {
             physics: {
                 default: "arcade",
                 arcade: {
-                    gravity: { y: 700 },
+                    gravity: { y: 700 / 1136 * screenHeight * pixelRatio },
                     debug: true
                 }
             },

@@ -26,6 +26,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.state = Player.State.JUMPING;
         this.startY = NaN;
         this.deltaY = 0;
+        this.maxVelocityX = 500 / 640 * this.scene.scale.width;
+
+        wx.startAccelerometer({
+            interval: 'game'
+        });
+        wx.onAccelerometerChange(({ x, y, z }) => {
+            if (this.state != Player.State.JUMPING) return;
+            x >= 0 ? this.turnRight() : this.turnLeft();
+            this.setVelocityX(this.maxVelocityX * x);
+        });
     }
 
     turnRight() {
@@ -48,8 +58,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             case Player.State.LANDED:
                 return;
         }
-
-        // Control player
     }
 
     onCollision(platform) {
@@ -79,6 +87,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.state = Player.State.FALLING;
         this.anims.play("falling");
 
+        this.setVelocityX(0);
         this.setCollideWorldBounds(true);
         this.body.bounce.setTo(1, 0);
         this.body.onWorldBounds = true;

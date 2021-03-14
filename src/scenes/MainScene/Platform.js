@@ -43,7 +43,7 @@ export default class Platform extends Phaser.GameObjects.Container {
     }
 
     init() {
-        this.bounceFactor = 800;
+        this.bounceFactor = 800 / 1136 * this.scene.scale.height;
         this.harmful = false;
 
         this.onCollisionAnims = [];
