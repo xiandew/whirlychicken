@@ -56,7 +56,7 @@ export default class Platform extends Phaser.GameObjects.Container {
         this.iterate((e) => { e.setTexture("spritesheet_jumper"); Platform.sprites.despawn(e); });
         this.removeAll();
 
-        this.baseFrame = randomChoice(frames.base);
+        this.baseFrame = this.scene.score.value < 500 ? "ground_grass.png" : randomChoice(frames.base);
 
         let components = [];
 
@@ -212,7 +212,10 @@ export default class Platform extends Phaser.GameObjects.Container {
             this.body.setOffset(0, 0.5 * this.body.height).setSize(this.body.width, ground.displayHeight);
         }
 
-        if (frames.lott.includes(this.baseFrame)) {
+        if (frames.lott.includes(this.baseFrame) &&
+            this.scene.score.value >= 1000 &&
+            Phaser.Math.Between(1, 10) == 1) {
+
             const bonus = Platform.sprites.spawn();
             bonus
                 .setScale(0.7 * Platform.width / bonus.width)

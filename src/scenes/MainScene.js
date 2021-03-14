@@ -49,6 +49,11 @@ export default class MainScene extends Phaser.Scene {
         this.bgLayer4 = this.add.image(0, this.scale.height, "bg_layer4").setOrigin(0, 1);
         this.bgLayer4.setScale(this.scale.width / this.bgLayer4.width);
 
+        // Create score text
+        const fontSize = 0.05 * this.scale.width;
+        this.score = this.add.bitmapText(fontSize, fontSize, "consolas", "0", fontSize).setOrigin(0).setScrollFactor(0);
+        this.score.value = 0;
+
         Platform.width = 0.08 * this.scale.width;
         Platform.separation = 2 * Platform.width;
         this.scoreUnit = Platform.separation / 50;
@@ -68,11 +73,6 @@ export default class MainScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, false);
 
         this.minPlatformY = Infinity;
-
-        // Create score text
-        const fontSize = 0.05 * this.scale.width;
-        this.score = this.add.bitmapText(fontSize, fontSize, "consolas", "0", fontSize).setOrigin(0).setScrollFactor(0);
-        this.score.value = 0;
 
         if (!this.game.debug) {
             return;
