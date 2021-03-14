@@ -28,9 +28,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.deltaY = 0;
         this.maxVelocityX = 500 / 640 * this.scene.scale.width;
 
-        wx.startAccelerometer({
-            interval: 'game'
-        });
         wx.onAccelerometerChange(({ x, y, z }) => {
             if (this.state != Player.State.JUMPING) return;
             x >= 0 ? this.turnRight() : this.turnLeft();
@@ -124,7 +121,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.play(animKey);
 
                 if (animKey == "walk") {
-                    this.setVelocityX(40 * (this.scaleX > 0 ? 1 : -1));
+                    this.setVelocityX(40 / 640 * this.scene.scale.width * (this.scaleX > 0 ? 1 : -1));
                 } else {
                     this.setVelocityX(0);
                 }

@@ -1,6 +1,5 @@
 import Phaser from "./libs/phaser-full.min";
-// import GameGlobal from "./data/GameGlobal";
-// import HomeScene from "./scenes/HomeScene";
+import HomeScene from "./scenes/HomeScene";
 import MainScene from "./scenes/MainScene";
 // import RankScene from "./scenes/RankScene";
 // import GameEnded from "./scenes/GameEnded";
@@ -15,7 +14,7 @@ export default class Main extends Phaser.Game {
             canvas: canvas,
             width: screenWidth * pixelRatio,
             height: screenHeight * pixelRatio,
-            // backgroundColor: 0xffffff,
+            backgroundColor: 0xade6ff,
             physics: {
                 default: "arcade",
                 arcade: {
@@ -27,28 +26,32 @@ export default class Main extends Phaser.Game {
                 touch: true
             },
             // scene: [HomeScene, MainScene, RankScene, GameEnded],
-            scene: MainScene
+            scene: [HomeScene, MainScene]
         });
         this.debug = true;
         this.audio = Audio.getInstance();
 
         const aspectRatio = 568 / 320;
         if (this.config.height / this.config.width > aspectRatio) {
-            GameGlobal.width = this.config.width;
-            GameGlobal.height = this.config.width * aspectRatio;
+            this.width = this.config.width;
+            this.height = this.config.width * aspectRatio;
         } else {
-            GameGlobal.height = this.config.height;
-            GameGlobal.width = this.config.height / aspectRatio;
+            this.height = this.config.height;
+            this.width = this.config.height / aspectRatio;
         }
-        GameGlobal.centerX = this.config.width * 0.5;
-        GameGlobal.centerY = this.config.height * 0.5;
+        this.centerX = this.config.width * 0.5;
+        this.centerY = this.config.height * 0.5;
 
         let sharedCanvas = wx.getOpenDataContext().canvas;
-        sharedCanvas.width = GameGlobal.width;
-        sharedCanvas.height = GameGlobal.height;
+        sharedCanvas.width = this.width;
+        sharedCanvas.height = this.height;
 
         wx.getOpenDataContext().postMessage({
             action: "Main"
+        });
+
+        wx.startAccelerometer({
+            interval: 'game'
         });
     }
 }

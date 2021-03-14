@@ -1,3 +1,4 @@
+import { range } from "../utils/Utils"
 import "./MainScene/utils/Pool";
 import Platform from "./MainScene/Platform";
 import Player from "./MainScene/Player";
@@ -17,23 +18,12 @@ export default class MainScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("crate", "assets/images/grain__x1_1_x1_2_x1_3_x1_4_png_1354830084.png");
-        this.load.image("bg_layer1", "assets/images/bg_layer1.png");
         this.load.image("bg_layer2", "assets/images/bg_layer2.png");
         this.load.image("bg_layer3", "assets/images/bg_layer3.png");
         this.load.image("bg_layer4", "assets/images/bg_layer4.png");
         this.load.atlas("spritesheet_jumper", "assets/atlas/spritesheet_jumper.png", "assets/atlas/spritesheet_jumper.json");
         this.load.spritesheet("flying", "assets/images/npc_chicken__x1_flying_png_1354830387.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("flying_back", "assets/images/npc_chicken__x1_flying_back_png_1354830391.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("fall", "assets/images/npc_chicken__x1_fall_png_1354830392.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("land", "assets/images/npc_chicken__x1_land_png_1354830389.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("idle1", "assets/images/npc_chicken__x1_idle1_png_1354830404.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("idle2", "assets/images/npc_chicken__x1_idle2_png_1354830405.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("idle3", "assets/images/npc_chicken__x1_idle3_png_1354830407.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("pecking_once", "assets/images/npc_chicken__x1_pecking_once_png_1354830398.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("pecking_twice", "assets/images/npc_chicken__x1_pecking_twice_png_1354830400.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("sit", "assets/images/npc_chicken__x1_sit_png_1354830401.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("walk", "assets/images/npc_chicken__x1_walk_png_1354830385.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("fire", "assets/images/fire.png", { frameWidth: 128, frameHeight: 128 });
         this.load.bitmapFont("consolas", "assets/fonts/bitmap/consolas_0.png", "assets/fonts/bitmap/consolas.xml");
     }
@@ -54,8 +44,6 @@ export default class MainScene extends Phaser.Scene {
         this.score = this.add.bitmapText(fontSize, fontSize, "consolas", "0", fontSize).setOrigin(0).setScrollFactor(0);
         this.score.value = 0;
 
-        Platform.width = 0.08 * this.scale.width;
-        Platform.separation = 2 * Platform.width;
         this.scoreUnit = Platform.separation / 50;
         Platform.sprites = this.add.pool({
             classType: Phaser.GameObjects.Sprite,
@@ -237,74 +225,6 @@ export default class MainScene extends Phaser.Scene {
             frameRate: 20
         });
 
-
-        this.anims.create({
-            key: "land",
-            frames: this.anims.generateFrameNumbers("land", {
-                frames: range(25)
-            }),
-            frameRate: 20
-        });
-
-        this.anims.create({
-            key: "falling",
-            frames: this.anims.generateFrameNumbers("fall", { end: 5 }),
-            frameRate: 20,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "crashland",
-            frames: this.anims.generateFrameNumbers("fall", { frames: range(6, 25) }),
-            frameRate: 20
-        });
-
-        this.anims.create({
-            key: "idle1",
-            frames: this.anims.generateFrameNumbers("idle1", { end: 66 }),
-            frameRate: 20
-        });
-
-        this.anims.create({
-            key: "idle2",
-            frames: this.anims.generateFrameNumbers("idle2", { end: 46 }),
-            frameRate: 20
-        });
-
-        this.anims.create({
-            key: "idle3",
-            frames: this.anims.generateFrameNumbers("idle3", { end: 85 }),
-            frameRate: 20
-        });
-
-        this.anims.create({
-            key: "pecking_once",
-            frames: this.anims.generateFrameNumbers("pecking_once", { end: 31 }),
-            frameRate: 20
-        });
-
-        this.anims.create({
-            key: "pecking_twice",
-            frames: this.anims.generateFrameNumbers("pecking_twice", { end: 39 }),
-            frameRate: 20
-        });
-
-        this.anims.create({
-            key: "sit",
-            frames: this.anims.generateFrameNumbers("sit", {
-                frames: range(20).concat(range(30).map(e => 19))
-            }),
-            frameRate: 20,
-            yoyo: true
-        });
-
-        this.anims.create({
-            key: "walk",
-            frames: this.anims.generateFrameNumbers("walk", { end: 23 }),
-            frameRate: 20,
-            repeat: 3
-        });
-
         this.anims.create({
             key: "wingmanflying",
             frames: this.anims.generateFrameNumbers("spritesheet_jumper", {
@@ -330,9 +250,4 @@ export default class MainScene extends Phaser.Scene {
             repeat: -1
         });
     }
-}
-
-function range(start, end) {
-    if (!end) end = start, start = 0;
-    return [...Array(end - start).keys()].map(i => i + start);
 }
