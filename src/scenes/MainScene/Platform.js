@@ -143,7 +143,7 @@ export default class Platform extends Phaser.GameObjects.Container {
                 ground.setY(0.2 * spikes.displayHeight);
                 break;
             case "ground_wood.png":
-                this.bounceFactor *= 3;
+                this.bounceFactor *= 1.7;
 
                 const spring = Platform.sprites.spawn();
                 spring.setFrame("spring.png");
@@ -155,7 +155,7 @@ export default class Platform extends Phaser.GameObjects.Container {
                 this.onCollisionAnims.push({ sprite: spring, animKey: "springinout" });
                 break;
             case "wingMan1.png":
-                this.bounceFactor *= 2;
+                this.bounceFactor *= 1.4;
 
                 const wingman = Platform.sprites.spawn();
                 wingman.setFrame(this.baseFrame);
@@ -229,7 +229,7 @@ export default class Platform extends Phaser.GameObjects.Container {
                 })
             );
 
-            this.bounceFactor *= 10;
+            this.bounceFactor *= 3;
         }
     }
 

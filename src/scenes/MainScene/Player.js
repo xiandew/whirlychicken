@@ -24,7 +24,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.body.checkCollision.right = false;
 
         this.state = Player.State.JUMPING;
-        this.startY = this.y;
+        this.startY = NaN;
         this.deltaY = 0;
     }
 
@@ -41,7 +41,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     update() {
         switch (this.state) {
             case Player.State.JUMPING:
-                this.deltaY = Math.max(this.deltaY, Math.abs(this.y - this.startY));
+                if (!Number.isNaN(this.startY)) this.deltaY = Math.max(this.deltaY, Math.abs(this.y - this.startY));
                 break;
             case Player.State.FALLING:
                 break;
@@ -54,6 +54,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     onCollision(platform) {
         if (this.state != Player.State.JUMPING) return;
+        if (Number.isNaN(this.startY)) this.startY = platform.y;
 
         this.setVelocityY(-platform.bounceFactor);
 

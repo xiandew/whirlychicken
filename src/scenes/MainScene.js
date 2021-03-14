@@ -50,6 +50,7 @@ export default class MainScene extends Phaser.Scene {
 
         Platform.width = 0.08 * this.scale.width;
         Platform.separation = 2 * Platform.width;
+        this.scoreUnit = Platform.separation / 50;
         Platform.sprites = this.add.pool({
             classType: Phaser.GameObjects.Sprite,
             defaultKey: "spritesheet_jumper"
@@ -66,6 +67,11 @@ export default class MainScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, false);
 
         this.minPlatformY = Infinity;
+
+        // Create score text
+        const fontSize = 0.05 * this.scale.width;
+        this.score = this.add.text(fontSize, fontSize, "0", { color: "black" }).setFontSize(fontSize).setOrigin(0).setScrollFactor(0);
+        this.score.value = 0;
 
         if (!this.game.debug) {
             return;
@@ -103,6 +109,11 @@ export default class MainScene extends Phaser.Scene {
         }
 
         if (this.player.state != Player.State.JUMPING) return;
+
+        // Update score
+        const currScore = Math.floor(this.player.deltaY / this.scoreUnit);
+        this.score.value = Math.max(this.score.value, currScore);
+        this.score.text = this.score.value.toString();
 
         this.physics.world.setBounds(
             0,
