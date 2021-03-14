@@ -1,20 +1,35 @@
 import Phaser from "../../libs/phaser-full.min";
 
-const groundFrames = [
-    "ground_stone_broken.png", // Periodically harmful √
-    "ground_grass.png", // Normal √
-    "ground_sand_broken.png", // Once off
-    "ground_snow.png", // Periodically invisible √
-    "ground_stone.png", // With spikes √
-    "ground_wood.png" // Spring √
-];
-
-const otherFrames = [
-    "wingMan1.png", // Mobile √
-    "cloud.png", // Fake √
-];
-
-const bonusFrame = "carrot.png";
+const frames = {
+    bonus: "carrot.png",
+    ground: [
+        "ground_grass.png", // Normal √
+        "ground_sand_broken.png", // Once off √
+        "ground_stone_broken.png", // Periodically harmful √
+        "ground_snow.png", // Periodically invisible √
+        "ground_stone.png", // With spikes √
+        "ground_wood.png" // Spring √
+    ],
+    lott: [
+        "wingMan1.png", // Mobile √
+        "ground_grass.png", // Normal √
+        "ground_sand_broken.png"
+    ],
+    mobile: [
+        "wingMan1.png",
+        "ground_stone_broken.png"
+    ],
+    base: [
+        "ground_grass.png",
+        "ground_sand_broken.png",
+        "ground_stone_broken.png",
+        "ground_snow.png",
+        "ground_stone.png",
+        "ground_wood.png",
+        "wingMan1.png",
+        "cloud.png", // Fake √
+    ]
+}
 
 export default class Platform extends Phaser.GameObjects.Container {
     constructor(scene, x, y) {
@@ -41,12 +56,12 @@ export default class Platform extends Phaser.GameObjects.Container {
         this.iterate((e) => { e.setTexture("spritesheet_jumper"); Platform.sprites.despawn(e); });
         this.removeAll();
 
-        this.baseFrame = randomChoice(groundFrames.concat(otherFrames));
+        this.baseFrame = randomChoice(frames.base);
 
         let components = [];
 
         let ground;
-        if (groundFrames.includes(this.baseFrame)) {
+        if (frames.ground.includes(this.baseFrame)) {
             ground = Platform.sprites.spawn();
             ground.setFrame(this.baseFrame);
             ground.setScale(Platform.width / ground.width);
@@ -71,11 +86,12 @@ export default class Platform extends Phaser.GameObjects.Container {
                         displayHeight: { start: 0, to: fire.displayHeight },
                         ease: "Power2",
                         yoyo: true,
-                        hold: 1000, // Not having the mushroom 
-                        onYoyo: () => { if (!this.harmful) this.harmful = true; },
+                        hold: 1000,
                         repeat: -1,
-                        repeatDelay: 1000, // having the mushroom
-                        onRepeat: () => { if (this.harmful) this.harmful = false; },
+                        repeatDelay: 1000,
+                        onUpdate: (tween, target) => {
+                            this.harmful = !!target.displayWidth;
+                        },
                     })
                 );
 
@@ -184,7 +200,7 @@ export default class Platform extends Phaser.GameObjects.Container {
         this.body.setCollideWorldBounds(true);
         this.body.bounce.setTo(1, 1);
 
-        if (this.baseFrame == "wingMan1.png" || this.baseFrame == "ground_stone_broken.png") {
+        if (frames.mobile.includes(this.baseFrame)) {
             this.body.setVelocityX(100);
         } else {
             this.body.setVelocityX(0);
@@ -192,6 +208,28 @@ export default class Platform extends Phaser.GameObjects.Container {
 
         if (this.baseFrame == "ground_stone_broken.png") {
             this.body.setOffset(0, 0.5 * this.body.height).setSize(this.body.width, ground.displayHeight);
+        }
+
+        if (frames.lott.includes(this.baseFrame)) {
+            const bonus = Platform.sprites.spawn();
+            bonus
+                .setScale(0.7 * Platform.width / bonus.width)
+                .setFrame(frames.bonus)
+                .setY(-0.55 * (this.body.height + bonus.displayHeight));
+            this.add(bonus);
+
+            this.tweens.push(
+                this.scene.tweens.add({
+                    targets: bonus,
+                    duration: 2000,
+                    y: { start: bonus.y, to: bonus.y - 0.25 * bonus.displayHeight },
+                    ease: "Linear",
+                    yoyo: true,
+                    repeat: -1
+                })
+            );
+
+            this.bounceFactor *= 10;
         }
     }
 
