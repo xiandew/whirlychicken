@@ -1,7 +1,7 @@
 import Phaser from "../../libs/phaser-full.min";
 
 const groundFrames = [
-    "ground_cake.png", // Periodically harmful √
+    "ground_stone_broken.png", // Periodically harmful √
     "ground_grass.png", // Normal √
     "ground_sand_broken.png", // Once off
     "ground_snow.png", // Periodically invisible √
@@ -29,6 +29,7 @@ export default class Platform extends Phaser.GameObjects.Container {
 
     init() {
         this.bounceFactor = 500;
+        this.harmful = false;
 
         this.onCollisionAnims = [];
         this.particleManagers.forEach((e) => e.destroy());
@@ -37,7 +38,7 @@ export default class Platform extends Phaser.GameObjects.Container {
         this.tweens = [];
         this.anims.forEach((e) => e.stop());
         this.anims = [];
-        this.iterate((e) => Platform.sprites.despawn(e));
+        this.iterate((e) => { e.setTexture("spritesheet_jumper"); Platform.sprites.despawn(e); });
         this.removeAll();
 
         this.baseFrame = randomChoice(groundFrames.concat(otherFrames));
@@ -53,27 +54,21 @@ export default class Platform extends Phaser.GameObjects.Container {
         }
 
         switch (this.baseFrame) {
-            case "ground_cake.png":
-                const mushroom = Platform.sprites.spawn();
-                mushroom.setFrame("mushroom_red.png");
-                mushroom.setScale(0.5 * Platform.width / mushroom.width);
-                components.unshift(mushroom);
+            case "ground_stone_broken.png":
+                const fire = Platform.sprites.spawn();
+                fire.setTexture("fire").setOrigin(0.5, 1);
+                fire.setScale(Platform.width / fire.width);
+                components.unshift(fire);
 
-                mushroom.setY(.4 * mushroom.displayHeight);
-                ground.setY(.4 * mushroom.displayHeight);
+                ground.setY(.5 * ground.displayHeight);
 
-                function getBodySize() {
-                    return 0.5 * ground.displayHeight + mushroom.displayHeight;
-                }
-
-                const maxBodySize = getBodySize();
-                this.harmful = false;
-
+                this.anims.push(fire.anims.play("fire"));
                 this.tweens.push(
                     this.scene.tweens.add({
-                        targets: mushroom,
+                        targets: fire,
                         duration: 400,
-                        displayHeight: { start: mushroom.displayHeight, to: 0 },
+                        displayWidth: { start: 0, to: fire.displayWidth },
+                        displayHeight: { start: 0, to: fire.displayHeight },
                         ease: "Power2",
                         yoyo: true,
                         hold: 1000, // Not having the mushroom 
@@ -81,16 +76,6 @@ export default class Platform extends Phaser.GameObjects.Container {
                         repeat: -1,
                         repeatDelay: 1000, // having the mushroom
                         onRepeat: () => { if (this.harmful) this.harmful = false; },
-                        onUpdate: () => {
-                            if (!this.body) return;
-                            const currBodySize = getBodySize();
-                            this.body.setSize(
-                                this.body.width,
-                                Math.max(ground.displayHeight, currBodySize)
-                            ).setOffset(
-                                0, maxBodySize - Math.max(ground.displayHeight, currBodySize)
-                            );
-                        }
                     })
                 );
 
@@ -130,6 +115,7 @@ export default class Platform extends Phaser.GameObjects.Container {
 
                 break;
             case "ground_stone.png":
+                this.bounceFactor = 200;
                 this.harmful = true;
 
                 const spikes = Platform.sprites.spawn();
@@ -153,9 +139,11 @@ export default class Platform extends Phaser.GameObjects.Container {
                 this.onCollisionAnims.push({ sprite: spring, animKey: "springinout" });
                 break;
             case "wingMan1.png":
+                this.bounceFactor *= 2;
+
                 const wingman = Platform.sprites.spawn();
                 wingman.setFrame(this.baseFrame);
-                wingman.setScale(Platform.width / wingman.width);;
+                wingman.setScale(Platform.width / wingman.width);
                 components.push(wingman);
 
                 this.anims.push(wingman.anims.play("wingmanflying"));
@@ -196,10 +184,14 @@ export default class Platform extends Phaser.GameObjects.Container {
         this.body.setCollideWorldBounds(true);
         this.body.bounce.setTo(1, 1);
 
-        if (this.baseFrame == "wingMan1.png" || this.baseFrame == "ground_cake.png") {
+        if (this.baseFrame == "wingMan1.png" || this.baseFrame == "ground_stone_broken.png") {
             this.body.setVelocityX(100);
         } else {
             this.body.setVelocityX(0);
+        }
+
+        if (this.baseFrame == "ground_stone_broken.png") {
+            this.body.setOffset(0, 0.5 * this.body.height).setSize(this.body.width, ground.displayHeight);
         }
     }
 
