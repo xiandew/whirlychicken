@@ -9,11 +9,6 @@ export default class GameEnded extends Phaser.Scene {
         this.currentScore = data.currentScore;
     }
 
-    preload() {
-        this.load.image("restart-btn", "assets/images/restart-btn.png");
-        // this.load.image("view-leaderboard-btn", "assets/images/view-leaderboard-btn.png");
-    }
-
     create() {
         this.createGameOverModal();
         this.showGameOverModal();

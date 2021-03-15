@@ -17,30 +17,11 @@ export default class MainScene extends Phaser.Scene {
         super("MainScene");
     }
 
-    preload() {
-        this.load.image("bg_layer1", "assets/images/bg_layer1.png");
-        this.load.image("bg_layer2", "assets/images/bg_layer2.png");
-        this.load.image("bg_layer3", "assets/images/bg_layer3.png");
-        this.load.image("bg_layer4", "assets/images/bg_layer4.png");
-        this.load.atlas("spritesheet_jumper", "assets/atlas/spritesheet_jumper.png", "assets/atlas/spritesheet_jumper.json");
-        this.load.spritesheet("flying", "assets/images/npc_chicken__x1_flying_png_1354830387.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("flying_back", "assets/images/npc_chicken__x1_flying_back_png_1354830391.png", { frameWidth: 148, frameHeight: 110 });
-        this.load.spritesheet("fire", "assets/images/fire.png", { frameWidth: 128, frameHeight: 128 });
-        this.load.bitmapFont("consolas", "assets/fonts/bitmap/consolas_0.png", "assets/fonts/bitmap/consolas.xml");
-    }
-
     create() {
         this.createAnimations();
 
-        this.bgLayer1 = this.add.image(0, 0, "bg_layer1").setOrigin(0).setScrollFactor(0).setDisplaySize(this.scale.width, this.scale.height);
-        this.bgLayer2 = this.add.tileSprite(0, 0, 0, 0, "bg_layer2").setOrigin(0).setScrollFactor(0);
-        this.bgLayer2.setScale(this.scale.height / this.bgLayer2.height);
-        this.bgLayer3 = this.add.image(0, this.scale.height, "bg_layer3").setOrigin(0, 1);
-        this.bgLayer3.setScale(this.scale.width / this.bgLayer3.width);
-        this.bgLayer4 = this.add.image(0, this.scale.height, "bg_layer4").setOrigin(0, 1);
-        this.bgLayer4.setScale(this.scale.width / this.bgLayer4.width);
+        (createBackground.bind(this))();
 
-        // Create score text
         const fontSize = 0.05 * this.scale.width;
         this.score = this.add.bitmapText(fontSize, fontSize, "consolas", "0", fontSize).setOrigin(0).setScrollFactor(0);
         this.score.value = 0;
@@ -216,7 +197,7 @@ export default class MainScene extends Phaser.Scene {
         this.anims.create({
             key: "takeoff",
             frames: this.anims.generateFrameNumbers("flying", {
-                frames: range(35, 42).concat(range(4))
+                frames: range(35, 42).concat(range(5))
             }),
             frameRate: 20,
         });
@@ -224,9 +205,9 @@ export default class MainScene extends Phaser.Scene {
         this.anims.create({
             key: "flying",
             frames: this.anims.generateFrameNumbers("flying", {
-                frames: range(4, 13)
+                frames: range(5, 13)
             }),
-            frameRate: 20,
+            frameRate: 10,
             repeat: -1
         });
 
@@ -261,4 +242,14 @@ export default class MainScene extends Phaser.Scene {
             repeat: -1
         });
     }
+}
+
+export function createBackground() {
+    this.bgLayer1 = this.add.image(0, 0, "bg_layer1").setOrigin(0).setScrollFactor(0).setDisplaySize(this.scale.width, this.scale.height);
+    this.bgLayer2 = this.add.tileSprite(0, 0, 0, 0, "bg_layer2").setOrigin(0).setScrollFactor(0);
+    this.bgLayer2.setScale(this.scale.height / this.bgLayer2.height);
+    this.bgLayer3 = this.add.image(0, this.scale.height, "bg_layer3").setOrigin(0, 1);
+    this.bgLayer3.setScale(this.scale.width / this.bgLayer3.width);
+    this.bgLayer4 = this.add.image(0, this.scale.height, "bg_layer4").setOrigin(0, 1);
+    this.bgLayer4.setScale(this.scale.width / this.bgLayer4.width);
 }
