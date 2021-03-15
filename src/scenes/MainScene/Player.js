@@ -26,9 +26,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.state = Player.State.JUMPING;
         this.startY = NaN;
         this.deltaY = 0;
-        this.maxVelocityX = 500 / 640 * this.scene.scale.width;
+        this.maxVelocityX = 640 / 640 * this.scene.scale.width;
 
         wx.onAccelerometerChange(({ x, y, z }) => {
+            if (Math.abs(x) < 0.1) return;
             if (this.state != Player.State.JUMPING) return;
             x >= 0 ? this.turnRight() : this.turnLeft();
             this.setVelocityX(this.maxVelocityX * x);
