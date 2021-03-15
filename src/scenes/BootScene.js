@@ -19,7 +19,8 @@ export default class BootScene extends Phaser.Scene {
         this.load.image("bg_layer4", "assets/images/bg_layer4.png");
         this.load.image("restart-btn", "assets/images/restart-btn.png");
 
-        this.load.spritesheet("checkbox", "assets/images/checkbox.png", { frameWidth: 80, frameHeight: 60 });
+        this.load.spritesheet("sound-sheet", "assets/images/sound-sheet.png", { frameWidth: 60.5, frameHeight: 60 });
+        this.load.spritesheet("music-sheet", "assets/images/music-sheet.png", { frameWidth: 59.5, frameHeight: 60 });
         this.load.spritesheet("fall", "assets/images/npc_chicken__x1_fall_png_1354830392.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("land", "assets/images/npc_chicken__x1_land_png_1354830389.png", { frameWidth: 148, frameHeight: 110 });
         this.load.spritesheet("idle1", "assets/images/npc_chicken__x1_idle1_png_1354830404.png", { frameWidth: 148, frameHeight: 110 });
