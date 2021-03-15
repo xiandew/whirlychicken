@@ -44,8 +44,8 @@ export default class MainScene extends Phaser.Scene {
         const fontSize = 0.05 * this.scale.width;
         this.score = this.add.bitmapText(fontSize, fontSize, "consolas", "0", fontSize).setOrigin(0).setScrollFactor(0);
         this.score.value = 0;
-
         this.scoreUnit = Platform.separation / 50;
+
         Platform.sprites = this.add.pool({
             classType: Phaser.GameObjects.Sprite,
             defaultKey: "spritesheet_jumper"
@@ -53,17 +53,18 @@ export default class MainScene extends Phaser.Scene {
         Platform.sprites.initializeWithSize(20);
         this.platforms = this.add.pool({ classType: Platform });
         this.platforms.initializeWithSize(10);
+        this.spawnPlatforms();
+        this.minPlatformY = Infinity;
 
         this.player = new Player(this, 0.5 * this.scale.width, 0.5 * this.scale.height, "land", 24);
         this.player.anims.play("flying", true);
 
-        this.spawnPlatforms();
-
         this.cameras.main.startFollow(this.player, false);
 
-        this.minPlatformY = Infinity;
+        wx.setKeepScreenOn({ keepScreenOn: true });
 
         this.events.on("shutdown", () => {
+            wx.setKeepScreenOn({ keepScreenOn: false });
             wx.offAccelerometerChange();
             this.events.off("shutdown");
         });
