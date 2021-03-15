@@ -80,7 +80,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
-    startFalling() {
+    startFalling(onLanded = () => { }) {
         this.state = Player.State.FALLING;
         this.anims.play("falling");
 
@@ -104,6 +104,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                             this.off("animationcomplete");
                             this.anims.play("land", true).on("animationcomplete", this.wander);
                         });
+
+                        onLanded();
                     }
                 }
             }

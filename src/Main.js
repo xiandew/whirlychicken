@@ -2,7 +2,7 @@ import Phaser from "./libs/phaser-full.min";
 import HomeScene from "./scenes/HomeScene";
 import MainScene from "./scenes/MainScene";
 // import RankScene from "./scenes/RankScene";
-// import GameEnded from "./scenes/GameEnded";
+import GameEnded from "./scenes/GameEnded";
 import Audio from "./utils/Audio";
 
 export default class Main extends Phaser.Game {
@@ -26,7 +26,7 @@ export default class Main extends Phaser.Game {
                 touch: true
             },
             // scene: [HomeScene, MainScene, RankScene, GameEnded],
-            scene: [HomeScene, MainScene]
+            scene: [HomeScene, MainScene, GameEnded]
         });
         this.debug = true;
         this.audio = Audio.getInstance();

@@ -63,9 +63,12 @@ export default class MainScene extends Phaser.Scene {
 
         this.minPlatformY = Infinity;
 
-        if (!this.game.debug) {
-            return;
-        }
+        this.events.on("shutdown", () => {
+            wx.offAccelerometerChange();
+            this.events.off("shutdown");
+        });
+
+        if (!this.game.debug) return;
         this.infoText = this.add.text(16, 16, "").setScrollFactor(0);
         this.add.text(32, this.scale.height, "W", { color: "black" }).setFontSize(32).setOrigin(0, 1).setScrollFactor(0)
             .setInteractive().on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
@@ -90,78 +93,84 @@ export default class MainScene extends Phaser.Scene {
 
         this.player.update();
 
+        if (this.player.state == Player.State.JUMPING) {
+            // Update score
+            const currScore = Math.floor(this.player.deltaY / this.scoreUnit);
+            this.score.value = Math.max(this.score.value, currScore);
+            this.score.text = this.score.value.toString();
+
+            // Update world and camera bounds as player moves up
+            this.physics.world.setBounds(
+                0,
+                -this.player.deltaY,
+                this.scale.width,
+                Math.min(2 * this.scale.height, this.scale.height + this.player.deltaY)
+            );
+            this.physics.world.wrap(this.player);
+            this.cameras.main.setBounds(
+                this.physics.world.bounds.x,
+                this.physics.world.bounds.y,
+                this.physics.world.bounds.width,
+                this.physics.world.bounds.height
+            );
+
+            // Recycle out-of-view platforms and update the current top and bottom of all platforms
+            let nPlatformsDespawned = 0;
+            this.maxPlatformY = -Infinity;
+            this.platforms.getChildren().forEach((e) => {
+                if (!e.active) return;
+
+                this.minPlatformY = Math.min(this.minPlatformY, e.y);
+                this.maxPlatformY = Math.max(this.maxPlatformY, e.y);
+
+                if (e.y - 0.5 * e.height > this.cameras.main.scrollY + this.scale.height) {
+                    this.platforms.despawn(e);
+                    nPlatformsDespawned++;
+                }
+            });
+
+            // Create new platforms
+            range(nPlatformsDespawned).forEach(() => {
+                this.minPlatformY = this.spawnPlatform(this.minPlatformY - Platform.separation).y;
+            });
+
+            // Check collisions
+            this.physics.world.collide(
+                this.player,
+                this.platforms.getChildren().filter(e => e.bounceFactor),
+                (player, platform) => {
+                    if (player.body.touching.down && platform.body.touching.up) {
+                        player.onCollision(platform);
+                        platform.onCollision();
+                    }
+                }
+            );
+
+            // Check overlapping
+            this.physics.world.overlap(
+                this.player,
+                this.platforms.getChildren().filter(e => !e.bounceFactor),
+                (player, platform) => {
+                    if (player.body.touching.down && platform.body.touching.up) {
+                        platform.onOverlap();
+                    }
+                }
+            );
+        }
+
         if (this.player.state == Player.State.JUMPING && this.player.y > this.maxPlatformY ||
             this.player.state == Player.State.WOUNDED) {
-            this.player.startFalling();
+            this.player.startFalling(() => {
+                // this.scene.pause();
+                this.scene.launch("GameEnded", { currentScore: this.score.value });
+                this.scene.bringToTop("GameEnded");
+            });
 
             this.bgLayer3.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
             this.bgLayer4.setY(Math.min(this.physics.world.bounds.bottom, this.scale.height));
         }
 
-        if (this.player.state != Player.State.JUMPING) return;
-
-        // Update score
-        const currScore = Math.floor(this.player.deltaY / this.scoreUnit);
-        this.score.value = Math.max(this.score.value, currScore);
-        this.score.text = this.score.value.toString();
-
-        this.physics.world.setBounds(
-            0,
-            -this.player.deltaY,
-            this.scale.width,
-            Math.min(2 * this.scale.height, this.scale.height + this.player.deltaY)
-        );
-        this.physics.world.wrap(this.player);
-        this.cameras.main.setBounds(
-            this.physics.world.bounds.x,
-            this.physics.world.bounds.y,
-            this.physics.world.bounds.width,
-            this.physics.world.bounds.height
-        );
-
-        let nPlatformsDespawned = 0;
-        this.maxPlatformY = -Infinity;
-        this.platforms.getChildren().forEach((e) => {
-            if (!e.active) return;
-
-            this.minPlatformY = Math.min(this.minPlatformY, e.y);
-            this.maxPlatformY = Math.max(this.maxPlatformY, e.y);
-
-            // Recycle out-of-view platforms
-            if (e.y - 0.5 * e.height > this.cameras.main.scrollY + this.scale.height) {
-                this.platforms.despawn(e);
-                nPlatformsDespawned++;
-            }
-        });
-
-        range(nPlatformsDespawned).forEach(() => {
-            this.minPlatformY = this.spawnPlatform(this.minPlatformY - Platform.separation).y;
-        });
-
-        this.physics.world.collide(
-            this.player,
-            this.platforms.getChildren().filter(e => e.bounceFactor),
-            (player, platform) => {
-                if (player.body.touching.down && platform.body.touching.up) {
-                    player.onCollision(platform);
-                    platform.onCollision();
-                }
-            }
-        );
-
-        this.physics.world.overlap(
-            this.player,
-            this.platforms.getChildren().filter(e => !e.bounceFactor),
-            (player, platform) => {
-                if (player.body.touching.down && platform.body.touching.up) {
-                    platform.onOverlap();
-                }
-            }
-        );
-
-        if (!this.game.debug) {
-            return;
-        }
+        if (!this.game.debug) return;
         const size = this.platforms.getLength();
         const used = this.platforms.getTotalUsed();
         const spriteSize = Platform.sprites.getLength();
