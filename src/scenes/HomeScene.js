@@ -102,34 +102,32 @@ export default class HomeScene extends Phaser.Scene {
         buttons.push(bgmBtn);
 
         let seBtn = this.add.sprite(
-            0.5 * this.scale.width + this.game.width * 0.15, bgmBtn.y,
+            0.5 * this.scale.width, bgmBtn.y,
             "sound-sheet", this.game.audio.bgmOn ? 0 : 1
         ).setInteractive();
         seBtn.setScale(0.09 * this.game.width / seBtn.width);
         seBtn.on("pointerdown", () => {
             if (this.game.audio.seOn) {
-                this.game.audio.seOn = false;
+                this.game.audio.setSoundEffect(false);
                 seBtn.setFrame(1);
             } else {
-                this.game.audio.seOn = true;
+                this.game.audio.setSoundEffect(true);
                 seBtn.setFrame(0);
             }
         });
         buttons.push(seBtn);
 
-        // let viewLbIconBtn = this.add.image(
-        //     0.5 * this.scale.width + this.game.width * 0.15,
-        //     0.5 * this.scale.height + this.game.height * 0.25,
-        //     "view-leaderboard-icon-btn"
-        // ).setInteractive();
-        // viewLbIconBtn.displayWidth = 0.09 * this.game.width;
-        // viewLbIconBtn.displayHeight = this.autoDisplayHeight(viewLbIconBtn);
-        // viewLbIconBtn.on("pointerup", () => {
-        //     this.scene.pause();
-        //     this.scene.launch("RankScene", { from: this.scene.key });
-        //     this.scene.bringToTop("RankScene");
-        // });
-        // buttons.push(viewLbIconBtn);
+        let viewLbIconBtn = this.add.image(
+            0.5 * this.scale.width + this.game.width * 0.15, bgmBtn.y,
+            "view-leaderboard-icon-btn"
+        ).setInteractive();
+        viewLbIconBtn.setScale(0.09 * this.game.width / viewLbIconBtn.width);
+        viewLbIconBtn.on("pointerup", () => {
+            this.scene.pause();
+            this.scene.launch("RankScene", { from: this.scene.key });
+            this.scene.bringToTop("RankScene");
+        });
+        buttons.push(viewLbIconBtn);
 
         buttons.forEach((button) => {
             button.on("pointerdown", function () {
@@ -142,14 +140,6 @@ export default class HomeScene extends Phaser.Scene {
         });
 
         this.events.on("shutdown", () => {
-            // wx.setStorage({
-            //     key: "setting",
-            //     data: JSON.stringify({
-            //         bgmOn: this.game.audio.bgmOn,
-            //         seOn: this.game.audio.seOn
-            //     })
-            // });
-
             wx.offAccelerometerChange(onAccelerometerChange);
             this.events.off("shutdown");
         });

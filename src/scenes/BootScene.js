@@ -12,12 +12,14 @@ export default class BootScene extends Phaser.Scene {
     preload() {
         this.load.image("rotate-phone", "assets/images/rotate-phone.png");
         this.load.image("start-btn", "assets/images/start-btn.png");
-        this.load.image("view-leaderboard-icon-btn", "assets/images/view-leaderboard-btn.png");
+        this.load.image("view-leaderboard-btn", "assets/images/view-leaderboard-btn.png");
+        this.load.image("view-leaderboard-icon-btn", "assets/images/view-leaderboard-icon-btn.png");
         this.load.image("bg_layer1", "assets/images/bg_layer1.png");
         this.load.image("bg_layer2", "assets/images/bg_layer2.png");
         this.load.image("bg_layer3", "assets/images/bg_layer3.png");
         this.load.image("bg_layer4", "assets/images/bg_layer4.png");
         this.load.image("restart-btn", "assets/images/restart-btn.png");
+        this.load.image("return-btn", "assets/images/return-btn.png");
 
         this.load.spritesheet("sound-sheet", "assets/images/sound-sheet.png", { frameWidth: 60.5, frameHeight: 60 });
         this.load.spritesheet("music-sheet", "assets/images/music-sheet.png", { frameWidth: 59.5, frameHeight: 60 });

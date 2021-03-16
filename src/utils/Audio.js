@@ -46,15 +46,32 @@ export default class Audio {
     playBGM() {
         this.bgm.play();
         this.bgmOn = true;
+        this.saveSettings();
     }
 
     stopBGM() {
         this.bgm.stop();
         this.bgmOn = false;
+        this.saveSettings();
     }
 
     play(seKey) {
         if (this.seOn && this.se[seKey]) this.se[seKey].play();
+    }
+
+    setSoundEffect(seOn) {
+        this.seOn = seOn;
+        this.saveSettings();
+    }
+
+    saveSettings() {
+        wx.setStorage({
+            key: "setting",
+            data: JSON.stringify({
+                bgmOn: this.game.audio.bgmOn,
+                seOn: this.game.audio.seOn
+            })
+        });
     }
 
     static getInstance() {
