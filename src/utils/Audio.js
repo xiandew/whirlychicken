@@ -22,7 +22,7 @@ export default class Audio {
         });
 
         this.bgmOn = false;
-        this.seOn = false;
+        this.seOn = true;
         try {
             let setting = wx.getStorageSync("setting")
             if (setting) {
@@ -68,8 +68,8 @@ export default class Audio {
         wx.setStorage({
             key: "setting",
             data: JSON.stringify({
-                bgmOn: this.game.audio.bgmOn,
-                seOn: this.game.audio.seOn
+                bgmOn: this.bgmOn,
+                seOn: this.seOn
             })
         });
     }

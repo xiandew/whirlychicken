@@ -87,7 +87,7 @@ export default class HomeScene extends Phaser.Scene {
         let bgmBtn = this.add.sprite(
             0.5 * this.scale.width - this.game.width * 0.15,
             0.5 * this.scale.height + this.game.height * 0.25,
-            "music-sheet", this.game.audio.seOn ? 0 : 1
+            "music-sheet", this.game.audio.bgmOn ? 0 : 1
         ).setInteractive();
         bgmBtn.setScale(0.09 * this.game.width / bgmBtn.width);
         bgmBtn.on("pointerup", () => {
@@ -103,7 +103,7 @@ export default class HomeScene extends Phaser.Scene {
 
         let seBtn = this.add.sprite(
             0.5 * this.scale.width, bgmBtn.y,
-            "sound-sheet", this.game.audio.bgmOn ? 0 : 1
+            "sound-sheet", this.game.audio.seOn ? 0 : 1
         ).setInteractive();
         seBtn.setScale(0.09 * this.game.width / seBtn.width);
         seBtn.on("pointerdown", () => {
