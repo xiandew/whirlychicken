@@ -9,6 +9,8 @@ import Audio from "./utils/Audio";
 export default class Main extends Phaser.Game {
 
     constructor() {
+        const debug = false;
+
         let { screenWidth, screenHeight, pixelRatio } = wx.getSystemInfoSync();
         super({
             type: Phaser.WEBGL,
@@ -20,7 +22,7 @@ export default class Main extends Phaser.Game {
                 default: "arcade",
                 arcade: {
                     gravity: { y: 700 / 1136 * screenHeight * pixelRatio },
-                    debug: true
+                    debug: debug
                 }
             },
             input: {
@@ -28,7 +30,7 @@ export default class Main extends Phaser.Game {
             },
             scene: [BootScene, HomeScene, MainScene, GameEnded, RankScene]
         });
-        this.debug = true;
+        this.debug = debug;
         this.audio = Audio.getInstance();
 
         const aspectRatio = 568 / 320;
