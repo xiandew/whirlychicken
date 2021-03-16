@@ -143,7 +143,8 @@ export default class MainScene extends Phaser.Scene {
         if (this.player.state == Player.State.JUMPING && this.player.y > this.maxPlatformY ||
             this.player.state == Player.State.WOUNDED) {
             this.player.startFalling(() => {
-                // this.scene.pause();
+                this.platforms.getChildren().forEach((e) => { if (e.active) e.exit(); });
+
                 this.scene.launch("GameEnded", { currentScore: this.score.value });
                 this.scene.bringToTop("GameEnded");
             });

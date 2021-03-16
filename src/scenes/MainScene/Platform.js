@@ -298,6 +298,21 @@ export default class Platform extends Phaser.GameObjects.Container {
         });
     }
 
+    exit() {
+        this.scene.tweens.add({
+            targets: this,
+            x: {
+                start: this.x,
+                to: this.x <= .5 * this.scene.scale.width ?
+                    .5 * this.width :
+                    this.scene.scale.width - .5 * this.width
+            },
+            alpha: 0,
+            duration: 400,
+            ease: "Power2"
+        });
+    }
+
     add(child) {
         super.add(child);
 

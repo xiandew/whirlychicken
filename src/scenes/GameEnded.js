@@ -48,18 +48,6 @@ export default class GameEnded extends Phaser.Scene {
         this.gameOverModal.alpha = 0;
         this.gameOverModal.setSize(0.9 * this.game.width, 0.7 * this.game.height);
 
-        let graphics = this.add.graphics();
-        graphics.fillStyle(0xeadeda, 1);
-        graphics.fillRoundedRect(
-            this.game.centerX - this.gameOverModal.width * 0.5,
-            this.game.centerY - this.gameOverModal.height * 0.5,
-            this.gameOverModal.width,
-            this.gameOverModal.height,
-            this.gameOverModal.width * 0.05
-        );
-        graphics.generateTexture("gameOverModalBackground");
-        graphics.destroy();
-        let gameOverModalBackground = this.add.sprite(0, 0, "gameOverModalBackground");
         // let gameOverText = this.add.image(0, -0.42 * this.gameOverModal.height, "gameover-text");
         // gameOverText.displayWidth = 0.9 * this.gameOverModal.width;
         // gameOverText.displayHeight = this.autoDisplayHeight(gameOverText);
@@ -94,7 +82,6 @@ export default class GameEnded extends Phaser.Scene {
         // });
         // this.game.audio.addNavTap(this.viewLeaderboardBtn);
 
-        this.gameOverModal.add(gameOverModalBackground);
         // this.gameOverModal.add(gameOverText);
         // this.gameOverModal.add(this.undoTextBtn);
         this.gameOverModal.add(this.restartBtn);
