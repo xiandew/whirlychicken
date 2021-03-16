@@ -84,38 +84,38 @@ export default class HomeScene extends Phaser.Scene {
         }
         wx.onAccelerometerChange(onAccelerometerChange);
 
-        let soundBtn = this.add.sprite(
+        let bgmBtn = this.add.sprite(
             0.5 * this.scale.width - this.game.width * 0.15,
             0.5 * this.scale.height + this.game.height * 0.25,
-            "sound-sheet", this.game.audio.musicOn ? 0 : 1
+            "music-sheet", this.game.audio.seOn ? 0 : 1
         ).setInteractive();
-        soundBtn.setScale(0.09 * this.game.width / soundBtn.width);
-        soundBtn.on("pointerup", () => {
+        bgmBtn.setScale(0.09 * this.game.width / bgmBtn.width);
+        bgmBtn.on("pointerup", () => {
             if (this.game.audio.bgmOn) {
-                soundBtn.setFrame(1);
+                bgmBtn.setFrame(1);
                 this.game.audio.stopBGM();
             } else {
-                soundBtn.setFrame(0);
+                bgmBtn.setFrame(0);
                 this.game.audio.playBGM();
             }
         });
-        buttons.push(soundBtn);
+        buttons.push(bgmBtn);
 
-        let bgmBtn = this.add.sprite(
-            0.5 * this.scale.width + this.game.width * 0.15, soundBtn.y,
-            "music-sheet", this.game.audio.bgmOn ? 0 : 1
+        let seBtn = this.add.sprite(
+            0.5 * this.scale.width + this.game.width * 0.15, bgmBtn.y,
+            "sound-sheet", this.game.audio.bgmOn ? 0 : 1
         ).setInteractive();
-        bgmBtn.setScale(0.09 * this.game.width / bgmBtn.width);
-        bgmBtn.on("pointerdown", () => {
-            if (this.game.audio.musicOn) {
-                this.game.audio.musicOn = false;
-                bgmBtn.setFrame(1);
+        seBtn.setScale(0.09 * this.game.width / seBtn.width);
+        seBtn.on("pointerdown", () => {
+            if (this.game.audio.seOn) {
+                this.game.audio.seOn = false;
+                seBtn.setFrame(1);
             } else {
-                this.game.audio.musicOn = true;
-                bgmBtn.setFrame(0);
+                this.game.audio.seOn = true;
+                seBtn.setFrame(0);
             }
         });
-        buttons.push(bgmBtn);
+        buttons.push(seBtn);
 
         // let viewLbIconBtn = this.add.image(
         //     0.5 * this.scale.width + this.game.width * 0.15,
@@ -131,22 +131,22 @@ export default class HomeScene extends Phaser.Scene {
         // });
         // buttons.push(viewLbIconBtn);
 
-        // buttons.forEach((button) => {
-        //     button.on("pointerdown", function () {
-        //         this.setTint(0xd3d3d3);
-        //     });
-        //     button.on("pointerup", function () {
-        //         this.clearTint();
-        //     });
-        //     this.game.audio.addNavTap(button);
-        // });
+        buttons.forEach((button) => {
+            button.on("pointerdown", function () {
+                this.setTint(0xd3d3d3);
+            });
+            button.on("pointerup", function () {
+                this.clearTint();
+            });
+            this.game.audio.addNavTap(button);
+        });
 
         this.events.on("shutdown", () => {
             // wx.setStorage({
             //     key: "setting",
             //     data: JSON.stringify({
             //         bgmOn: this.game.audio.bgmOn,
-            //         musicOn: this.game.audio.musicOn
+            //         seOn: this.game.audio.seOn
             //     })
             // });
 

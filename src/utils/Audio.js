@@ -4,47 +4,42 @@ export default class Audio {
         this.bgm.loop = true;
         this.bgm.src = "assets/media/bgm.mp3";
 
-        this.chickenClucking = wx.createInnerAudioContext();
-        this.chickenClucking.src = "assets/media/chicken-clucking.mp3";
+        // Sound effects
+        this.se = {
+            "chickenclucking": "assets/media/chicken-clucking.mp3",
+            "chickentweet": "assets/media/chicken-tweet.mp3",
+            "jumpbonus": "assets/media/jump-bonus.mp3",
+            "jumpspring": "assets/media/jump-spring.mp3",
+            "jumprock": "assets/media/jump-rock.mp3",
+            "jump": "assets/media/jump.mp3",
+            "tap": "assets/media/tap.m4a"
+        };
 
-        this.chickenTweet = wx.createInnerAudioContext();
-        this.chickenTweet.src = "assets/media/chicken-tweet.mp3";
+        Object.keys(this.se).forEach((key) => {
+            let ctx = wx.createInnerAudioContext();
+            ctx.src = this.se[key];
+            this.se[key] = ctx;
+        });
 
-        this.gameOver = wx.createInnerAudioContext();
-        this.gameOver.src = "assets/media/game-over.mp3";
+        this.bgmOn = false;
+        this.seOn = false;
+        try {
+            let setting = wx.getStorageSync("setting")
+            if (setting) {
+                setting = JSON.parse(setting);
+                this.bgmOn = setting.bgmOn;
+                this.seOn = setting.musicOn;
 
-        this.jumpBonus = wx.createInnerAudioContext();
-        this.jumpBonus.src = "assets/media/jump-bonus.mp3";
-
-        this.jumpSpring = wx.createInnerAudioContext();
-        this.jumpSpring.src = "assets/media/jump-spring.mp3";
-
-        this.jump = wx.createInnerAudioContext();
-        this.jump.src = "assets/media/jump.mp3";
-
-        // this.bgmOn = true;
-        // this.musicOn = true;
-        // try {
-        //     let setting = wx.getStorageSync("setting")
-        //     if (setting) {
-        //         setting = JSON.parse(setting);
-        //         this.bgmOn = setting.bgmOn;
-        //         this.musicOn = setting.musicOn;
-
-        //         if (this.bgmOn) {
-        //             this.playBGM();
-        //         }
-        //     }
-        // } catch (e) {
-        //     console.error(e);
-        // }
+                if (this.bgmOn) this.playBGM();
+            }
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     addNavTap(button) {
         button.on("pointerup", () => {
-            if (this.musicOn) {
-                this.navTap.play();
-            }
+            if (this.seOn) this.se.tap.play();
         });
     }
 
@@ -58,18 +53,12 @@ export default class Audio {
         this.bgmOn = false;
     }
 
-    playMatch() {
-        if (this.musicOn) this.gameOver.play();
-    }
-
-    playPlaceChess() {
-        if (this.musicOn) this.chickenTweet.play();
+    play(seKey) {
+        if (this.seOn && this.se[seKey]) this.se[seKey].play();
     }
 
     static getInstance() {
-        if (!Audio.instance) {
-            Audio.instance = new Audio();
-        }
+        if (!Audio.instance) Audio.instance = new Audio();
         return Audio.instance;
     }
 }

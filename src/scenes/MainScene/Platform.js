@@ -55,6 +55,7 @@ export default class Platform extends Phaser.GameObjects.Container {
     init() {
         this.bounceFactor = 900 / 1136 * this.scene.scale.height;
         this.harmful = false;
+        this.seKey = "jump";
 
         this.onCollisionAnims = [];
         this.particleManagers.forEach((e) => e.destroy());
@@ -110,7 +111,13 @@ export default class Platform extends Phaser.GameObjects.Container {
                         repeatDelay: 1000,
                         onUpdate: (tween, target) => {
                             this.harmful = !!target.displayWidth;
-                            this.bounceFactor = this.harmful ? maxBounceFactor * 0.3 : maxBounceFactor;
+                            if (this.harmful) {
+                                this.bounceFactor = maxBounceFactor * 0.3;
+                                this.seKey = null;
+                            } else {
+                                this.bounceFactor = maxBounceFactor;
+                                this.seKey = "jump";
+                            }
                         },
                     })
                 );
@@ -119,6 +126,8 @@ export default class Platform extends Phaser.GameObjects.Container {
             case "ground_grass.png":
                 break;
             case "ground_sand_broken.png":
+                this.seKey = "jumprock";
+
                 this.particleManagers.push(
                     this.scene.add.particles("spritesheet_jumper", null, {
                         frame: ["grass_brown1.png", "grass_brown2.png"],
@@ -151,6 +160,8 @@ export default class Platform extends Phaser.GameObjects.Container {
 
                 break;
             case "ground_stone.png":
+                this.seKey = null;
+
                 this.bounceFactor *= 0.3;
                 this.harmful = true;
 
@@ -163,6 +174,8 @@ export default class Platform extends Phaser.GameObjects.Container {
                 ground.setY(0.2 * spikes.displayHeight);
                 break;
             case "ground_wood.png":
+                this.seKey = "jumpspring";
+
                 this.bounceFactor *= 1.7;
 
                 const spring = Platform.sprites.spawn();
@@ -230,9 +243,12 @@ export default class Platform extends Phaser.GameObjects.Container {
             this.body.setOffset(0, 0.5 * this.body.height).setSize(this.body.width, ground.displayHeight);
         }
 
-        if (frames.lott.includes(this.baseFrame) &&
+        if (
+            frames.lott.includes(this.baseFrame) &&
             this.scene.score.value >= 1000 &&
-            Phaser.Math.Between(1, 10) == 1) {
+            Phaser.Math.Between(1, 10) == 1
+        ) {
+            this.seKey = "jumpbonus";
 
             const bonus = Platform.sprites.spawn();
             bonus
@@ -265,6 +281,8 @@ export default class Platform extends Phaser.GameObjects.Container {
             this.playParticles();
             this.body.setEnable(false);
         }
+
+        this.scene.game.audio.play(this.seKey);
     }
 
     onOverlap() {

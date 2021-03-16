@@ -71,6 +71,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.state = Player.State.WOUNDED;
             });
 
+            this.scene.game.audio.play("chickentweet");
             return;
         }
 
@@ -79,11 +80,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.off("animationcomplete");
             this.anims.play("flying", true);
         });
+
+        this.scene.game.audio.play("chickenclucking");
     }
 
     startFalling(onLanded = () => { }) {
         this.state = Player.State.FALLING;
         this.anims.play("falling");
+
+        this.scene.game.audio.play("chickentweet");
 
         this.setVelocityX(0);
         this.setCollideWorldBounds(true);
