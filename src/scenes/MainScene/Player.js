@@ -16,8 +16,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.setOrigin(0.71, 0.5);
-        this.setScale(3 * Platform.width / this.width);
-        this.body.setSize(50, 90);
+        this.setScale(2.5 * Platform.width / this.width);
+        this.body.setSize(60, 90);
         this.turnRight();
         this.body.checkCollision.up = false;
         this.body.checkCollision.left = false;
@@ -26,10 +26,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.state = Player.State.JUMPING;
         this.startY = NaN;
         this.deltaY = 0;
-        this.maxVelocityX = 640 / 640 * this.scene.scale.width;
+        this.maxVelocityX = 1200 / 640 * this.scene.scale.width;
 
         wx.onAccelerometerChange(({ x, y, z }) => {
-            if (Math.abs(x) < 0.1) return;
+            if (Math.abs(x) < 0.01) return;
             if (this.state != Player.State.JUMPING) return;
             x >= 0 ? this.turnRight() : this.turnLeft();
             this.setVelocityX(this.maxVelocityX * x);
@@ -38,12 +38,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     turnRight() {
         this.setScale(Math.abs(this.scaleX), this.scaleY);
-        this.body.setOffset(80, 0);
+        this.body.setOffset(75, 0);
     }
 
     turnLeft() {
         this.setScale(Math.abs(this.scaleX) * -1, this.scaleY);
-        this.body.setOffset(130, 0);
+        this.body.setOffset(135, 0);
     }
 
     update() {

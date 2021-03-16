@@ -43,7 +43,7 @@ export default class Platform extends Phaser.GameObjects.Container {
     }
 
     init() {
-        this.bounceFactor = 800 / 1136 * this.scene.scale.height;
+        this.bounceFactor = 900 / 1136 * this.scene.scale.height;
         this.harmful = false;
 
         this.onCollisionAnims = [];
@@ -87,7 +87,7 @@ export default class Platform extends Phaser.GameObjects.Container {
                         displayHeight: { start: 0, to: fire.displayHeight },
                         ease: "Power2",
                         yoyo: true,
-                        hold: 1000,
+                        hold: 500,
                         repeat: -1,
                         repeatDelay: 1000,
                         onUpdate: (tween, target) => {

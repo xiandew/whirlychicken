@@ -169,7 +169,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnPlatforms() {
-        range(Math.floor(this.scale.height / Platform.separation)).forEach((e, i) => {
+        range(Math.ceil(this.scale.height / Platform.separation)).forEach((e, i) => {
             this.spawnPlatform(this.scale.height - Platform.separation - Platform.separation * i);
         });
     }

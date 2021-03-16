@@ -67,7 +67,7 @@ export default class HomeScene extends Phaser.Scene {
         }
 
         Platform.width = 0.08 * this.scale.width;
-        Platform.separation = 2 * Platform.width;
+        Platform.separation = 2.5 * Platform.width;
 
         const player = new Player(this, 0.5 * this.scale.width, 0.8 * this.scale.height, "land", 24);
         player.state = Player.State.FALLING;
