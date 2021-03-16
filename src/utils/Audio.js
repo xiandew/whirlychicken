@@ -28,7 +28,7 @@ export default class Audio {
             if (setting) {
                 setting = JSON.parse(setting);
                 this.bgmOn = setting.bgmOn;
-                this.seOn = setting.musicOn;
+                this.seOn = setting.seOn;
 
                 if (this.bgmOn) this.playBGM();
             }
