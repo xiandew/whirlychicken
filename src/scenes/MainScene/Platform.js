@@ -28,8 +28,18 @@ const frames = {
         "ground_wood.png",
         "wingMan1.png",
         "cloud.png", // Fake √
+    ],
+    consecutive: [
+        "ground_grass.png",
+        "ground_sand_broken.png",
+        "ground_stone_broken.png",
+        "ground_snow.png",
+        "ground_wood.png",
+        "wingMan1.png"
     ]
 }
+
+let lastBaseFrame;
 
 export default class Platform extends Phaser.GameObjects.Container {
     constructor(scene, x, y) {
@@ -56,7 +66,15 @@ export default class Platform extends Phaser.GameObjects.Container {
         this.iterate((e) => { e.setTexture("spritesheet_jumper"); Platform.sprites.despawn(e); });
         this.removeAll();
 
-        this.baseFrame = this.scene.score.value < 500 ? "ground_grass.png" : randomChoice(frames.base);
+        this.baseFrame =
+            this.scene.score.value < 500 ?
+                "ground_grass.png" :
+                randomChoice(
+                    frames.consecutive.includes(lastBaseFrame) ?
+                        frames.base :
+                        frames.consecutive
+                );
+        lastBaseFrame = this.baseFrame;
 
         let components = [];
 
