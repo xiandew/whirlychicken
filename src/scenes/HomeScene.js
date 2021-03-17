@@ -24,6 +24,12 @@ export default class HomeScene extends Phaser.Scene {
             "rotate-phone"
         );
         rotatePhoneIcon.setScale(0.2 * this.game.width / rotatePhoneIcon.width);
+        this.add.text(
+            0.5 * this.scale.width,
+            rotatePhoneIcon.y + 0.75 * rotatePhoneIcon.displayHeight,
+            "左右倾斜手机\n控制移动方向",
+            { color: "black" }
+        ).setOrigin(0.5, 0).setFontSize(0.05 * this.scale.width);
 
         let buttons = [];
 
