@@ -70,16 +70,10 @@ export default class HomeScene extends Phaser.Scene {
         Platform.separation = 2.5 * Platform.width;
 
         const player = new Player(this, 0.5 * this.scale.width, 0.8 * this.scale.height, "land", 24);
-        player.state = Player.State.FALLING;
         player.startFalling();
 
         function onAccelerometerChange({ x, y, z }) {
-            if (Math.abs(x) < 0.1) return;
-            if (x >= 0) {
-                player.turnRight();
-            } else {
-                player.turnLeft();
-            }
+            if (Math.abs(x) >= 0.05) x >= 0 ? player.turnRight() : player.turnLeft();
             player.setVelocityX(Math.abs(player.body.velocity.x) * (x >= 0 ? 1 : -1));
         }
         wx.onAccelerometerChange(onAccelerometerChange);
