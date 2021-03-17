@@ -111,7 +111,7 @@ class Main {
         if (action === "RankScene") {
             if (msg.tab) {
                 let tab = msg.tab === "thisWeek" ? Main.Tab.THISWEEK : Main.Tab.BESTRECORD;
-                if (tab === this.activeTab) return;
+                if (tab === this.activeTab && !msg.score) return;
                 this.activeTab = tab;
             }
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
