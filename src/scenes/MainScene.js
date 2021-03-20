@@ -41,6 +41,7 @@ export default class MainScene extends Phaser.Scene {
         this.player.anims.play("flying", true);
 
         this.cameras.main.startFollow(this.player, false);
+        this.cameras.main.setDeadzone(this.scale.width, 0.2 * this.scale.height);
 
         wx.setKeepScreenOn({ keepScreenOn: true });
 
