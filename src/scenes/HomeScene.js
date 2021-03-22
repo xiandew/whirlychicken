@@ -75,14 +75,17 @@ export default class HomeScene extends Phaser.Scene {
         Platform.width = 0.08 * this.scale.width;
         Platform.separation = 2.5 * Platform.width;
 
-        const player = new Player(this, 0.5 * this.scale.width, 0.8 * this.scale.height, "land", 24);
-        player.startFalling();
+        this.player = new Player(this, 0.5 * this.scale.width, 0.8 * this.scale.height, "land", 24);
+        this.player.startFalling();
 
-        function onAccelerometerChange({ x, y, z }) {
-            if (Math.abs(x) >= 0.05) x >= 0 ? player.turnRight() : player.turnLeft();
-            player.setVelocityX(Math.abs(player.body.velocity.x) * (x >= 0 ? 1 : -1));
+        let onAccelerometerChange = ({ x, y, z }) => {
+            if (Math.abs(x) >= 0.05) x >= 0 ? this.player.turnRight() : this.player.turnLeft();
+            this.player.setVelocityX(Math.abs(this.player.body.velocity.x) * (x >= 0 ? 1 : -1));
         }
         wx.onAccelerometerChange(onAccelerometerChange);
+
+        this.physics.world.checkCollision.left = false;
+        this.physics.world.checkCollision.right = false;
 
         let bgmBtn = this.add.sprite(
             0.5 * this.scale.width - this.game.width * 0.15,
@@ -143,6 +146,10 @@ export default class HomeScene extends Phaser.Scene {
             wx.offAccelerometerChange(onAccelerometerChange);
             this.events.off("shutdown");
         });
+    }
+
+    update() {
+        this.physics.world.wrap(this.player, .5 * this.player.body.width);
     }
 
     createAnimations() {
