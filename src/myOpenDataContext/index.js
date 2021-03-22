@@ -216,7 +216,7 @@ class Main {
         let myself = friends.find((f) => f.nickname == DataStore.userInfo.nickName && f.avatarUrl == DataStore.userInfo.avatarUrl);
         if (!myself) {
             myself = {
-                rank: friends.length,
+                rank: friends.length + 1,
                 avatarUrl: DataStore.userInfo.avatarUrl,
                 nickname: DataStore.userInfo.nickName,
                 record: { score: 0 }
